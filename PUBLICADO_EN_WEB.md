@@ -1,9 +1,12 @@
 # Publicación de MJ Struct
 
-GitHub Pages usa **Deploy from a branch**, rama `main`, carpeta `/(root)`. La configuración de Jekyll en `_config.yml` deja fuera del sitio los archivos de desarrollo que sí forman parte del repositorio público.
+**[Abrir la web oficial de MJ Struct](https://mjstructofficial-hub.github.io/mj-struct-web/)**
 
-- Repositorio de publicación: [mjstructofficial-hub/mj-struct-web](https://github.com/mjstructofficial-hub/mj-struct-web).
-- Dirección de GitHub Pages: [mjstructofficial-hub.github.io/mj-struct-web](https://mjstructofficial-hub.github.io/mj-struct-web/).
+Esta es la única dirección que debes guardar o compartir. Desde la portada, usa **Abrir MapaPro** o **Abrir Transcriptor**. Las dos herramientas forman parte del mismo sitio y se actualizan en su ruta habitual cuando se publica `main`.
+
+En GitHub puedes consultar el código y esta guía. Para usar las herramientas, entra por el enlace de la web oficial.
+
+GitHub Pages usa **Deploy from a branch**, rama `main`, carpeta `/(root)`. La configuración de Jekyll en `_config.yml` deja fuera del sitio los archivos de desarrollo que sí forman parte del repositorio público.
 
 ## Inventario del sitio
 
@@ -28,7 +31,7 @@ GitHub Pages usa **Deploy from a branch**, rama `main`, carpeta `/(root)`. La co
 
 ## Web3Forms
 
-Haz una consulta de prueba desde `https://mjstructofficial-hub.github.io/mj-struct-web/`. Si el formulario usa **Restrict to Domain** de Web3Forms Pro, reemplaza `localhost` por `mjstructofficial-hub.github.io`. Ese campo acepta el dominio sin `https://` ni `/mj-struct-web/`. Configúralo después de probar el formulario.
+Haz una consulta de prueba desde la portada enlazada arriba. Si el formulario usa **Restrict to Domain** de Web3Forms Pro, reemplaza `localhost` por `mjstructofficial-hub.github.io`. Ese campo acepta el dominio sin `https://` ni `/mj-struct-web/`. Configúralo después de probar el formulario.
 
 - [Configurar la fuente de publicación en GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 - [Restringir Web3Forms a un dominio](https://docs.web3forms.com/getting-started/pro-features/restrict-to-domain)
