@@ -6,6 +6,7 @@
 # Evita exponer bancos JSON con respuestas, configuraciones de licencias e imágenes internas en GitHub público
 /_PRIVADO_NO_PUBLICAR/
 Simulador Complexivo/
+/CSI a cualquier version/
 
 # 2. Entornos virtuales pesados de Python (cientos de MB de faster-whisper / ctranslate2)
 Transcriptor de Audio/.venv/

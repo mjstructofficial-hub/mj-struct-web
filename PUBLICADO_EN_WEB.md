@@ -2,7 +2,7 @@
 
 **[Abrir la web oficial de MJ Struct](https://mjstructofficial-hub.github.io/mj-struct-web/)**
 
-Esta es la única dirección que debes guardar o compartir. Desde la portada, usa **Abrir MapaPro** o **Abrir Transcriptor**. Las dos herramientas forman parte del mismo sitio y se actualizan en su ruta habitual cuando se publica `main`.
+Esta es la única dirección que debes guardar o compartir. Desde la portada, usa **Abrir MapaPro** o **Ver demostración del Transcriptor**. Ambas páginas forman parte del mismo sitio y se actualizan en su ruta habitual cuando se publica `main`.
 
 En GitHub puedes consultar el código y esta guía. Para usar las herramientas, entra por el enlace de la web oficial.
 
@@ -20,7 +20,20 @@ GitHub Pages usa **Deploy from a branch**, rama `main`, carpeta `/(root)`. La co
 | `Transcriptor de Audio/index.html` | Demostración del Transcriptor; la transcripción requiere el servidor local |
 | `assets/img/Mjstruct.png` | Logo PNG |
 | `assets/img/Mjstruct.webp` | Logo WebP |
+| `assets/img/og-mj-struct.png` | Tarjeta que acompaña al enlace al compartir la portada |
 | `descargas/Importador.xlsm` | Descarga pública aprobada |
+| `descargas/CSI-Migration-Studio.exe` | Migrador de modelos de texto de ETABS, SAP2000 y SAFE para Windows x64 |
+| `sitemap.xml` | URLs principales para buscadores |
+
+## Compartir el sitio
+
+Comparte la portada enlazada arriba. Ahí se puede abrir MapaPro NEC-15 y el Cubicador de Vigas, descargar el Importador de Excel para ETABS y el Migrador CSI, o solicitar una cotización. El Simulador se ofrece por consulta y el Transcriptor sigue en demostración web hasta que el motor remoto esté disponible.
+
+## Organización de las carpetas
+
+- `assets/`, `descargas/` y las páginas de MapaPro, Cubicador y Transcriptor que aparecen en el inventario se sirven desde GitHub Pages.
+- El repositorio contiene también el código Android del Cubicador y el servidor local del Transcriptor. Jekyll excluye ese código de la web.
+- Las fuentes y la compilación del Migrador CSI se guardan en `_PRIVADO_NO_PUBLICAR/Desarrollo/`. El Simulador comercial, `_work/` y `.venv/` quedan fuera del repositorio público.
 
 ## Actualizar el sitio
 
