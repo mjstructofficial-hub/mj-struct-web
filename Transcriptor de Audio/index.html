@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f172a">
-  <title>Transcriptor Video a Texto IA | MJ Struct</title>
+  <title>Transcriptor IA | MJ Struct</title>
   <link rel="icon" type="image/webp" href="../assets/img/Mjstruct.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,6 +30,7 @@
       height: 20px;
       animation: spin .8s linear infinite;
     }
+    [hidden] { display: none !important; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -49,7 +50,7 @@
               PYTHON IA
             </span>
           </div>
-          <span class="text-xs text-slate-400 font-mono">Transcriptor Local de Video a Texto</span>
+          <span class="text-xs text-slate-400 font-mono">Transcriptor IA</span>
         </div>
       </a>
       <a href="../index.html" class="px-4 py-2.5 rounded-xl text-xs font-mono font-bold bg-[#1e293b] text-slate-200 border border-slate-700 hover:border-[#38bdf8] hover:text-[#38bdf8] transition-all">
@@ -60,27 +61,29 @@
 
   <main class="mx-auto flex flex-1 w-full max-w-3xl items-center px-5 py-12">
     <section class="w-full rounded-3xl border border-[#38bdf8]/40 bg-[#1e293b]/95 p-6 shadow-2xl shadow-black/40 backdrop-blur sm:p-10">
-      <div class="mb-6">
-        <p class="mb-2 text-xs font-mono font-bold uppercase tracking-[.2em] text-[#38bdf8]">// PROCESAMIENTO LOCAL EN MEMORIA RAM</p>
-        <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Video a Texto con IA</h1>
-        <p class="mt-3 max-w-xl text-sm text-slate-300">Pega un enlace público de YouTube, TikTok, Instagram Reels o Facebook. El audio se procesa en memoria con Faster-Whisper sin escribir archivos temporales al disco.</p>
-        <div class="mt-4 p-3.5 rounded-xl bg-[#070c18]/90 border border-indigo-500/40 text-xs font-mono text-indigo-300">
-          <strong>Modo de Ejecución Local:</strong> Esta interfaz requiere que el motor Python (<code class="text-white">FastAPI + Faster-Whisper</code>) esté activo en tu equipo mediante <code class="text-white">iniciar_programa.bat</code> (<code class="text-white">http://127.0.0.1:8000</code>). En hosting estático (como GitHub Pages) funciona como vista demostrativa.
+      <div>
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Video a texto con IA</h1>
+          <span id="modeBadge" class="rounded-full border border-[#38bdf8]/30 bg-[#38bdf8]/10 px-2.5 py-1 text-xs font-mono font-semibold text-sky-200">Demostración web</span>
         </div>
+        <p id="demoHelp" class="mt-4 rounded-xl border border-indigo-500/40 bg-[#070c18]/90 p-3.5 text-sm leading-relaxed text-slate-300">
+          Para transcribir en Windows, descarga el <a href="https://github.com/mjstructofficial-hub/mj-struct-web" class="font-semibold text-sky-300 underline underline-offset-2 hover:text-sky-200">proyecto en GitHub</a>, ejecuta <code class="text-white">run.bat</code> en la carpeta <strong>Transcriptor de Audio</strong> y abre el Transcriptor desde el portal local.
+        </p>
+        <p id="localHelp" class="mt-3 max-w-xl text-sm text-slate-300" hidden>Pega un enlace público de YouTube, TikTok, Instagram Reels o Facebook. El audio se procesa en memoria con Faster-Whisper.</p>
       </div>
 
-      <form id="form" class="space-y-4">
+      <form id="form" method="post" class="mt-6 space-y-4" hidden>
         <label for="url" class="block text-xs font-mono uppercase text-slate-300">Enlace del video</label>
         <div class="flex flex-col gap-3 sm:flex-row">
-          <input id="url" name="url" type="url" required autocomplete="url" placeholder="https://www.youtube.com/watch?v=…"
+          <input id="url" name="url" type="url" required disabled autocomplete="url" placeholder="https://www.youtube.com/watch?v=…"
             class="min-w-0 flex-1 rounded-xl border border-slate-700 bg-[#070c18] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-[#38bdf8]">
-          <button id="submit" type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#38bdf8] to-cyan-300 px-6 py-3 text-sm font-extrabold text-[#070c18] transition hover:from-sky-300 hover:to-white disabled:cursor-not-allowed disabled:opacity-60">
+          <button id="submit" type="submit" disabled class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#38bdf8] to-cyan-300 px-6 py-3 text-sm font-extrabold text-[#070c18] transition hover:from-sky-300 hover:to-white disabled:cursor-not-allowed disabled:opacity-60">
             <span id="spinner" class="spinner hidden" aria-hidden="true"></span><span id="submitText">Transcribir</span>
           </button>
         </div>
       </form>
 
-      <p id="status" class="mt-4 min-h-6 text-sm text-slate-400" role="status" aria-live="polite"></p>
+      <p id="status" class="mt-4 min-h-6 text-sm text-slate-400" role="status" aria-live="polite" hidden></p>
       <section id="resultSection" class="mt-5 hidden">
         <div class="mb-2 flex items-center justify-between gap-3">
           <h2 class="font-bold text-white">Transcripción</h2>
@@ -115,21 +118,19 @@
     const copyButton = document.querySelector('#copy');
 
     const isLocalServer = ['127.0.0.1', 'localhost'].includes(window.location.hostname) && window.location.protocol.startsWith('http');
-    if (!isLocalServer) {
-      urlInput.disabled = true;
-      submitButton.disabled = true;
-      submitText.textContent = 'Solo en Servidor Local';
-      status.className = 'mt-4 min-h-6 text-sm text-amber-300';
-      status.textContent = 'Vista demostrativa: para transcribir videos, ejecuta iniciar_programa.bat en tu computadora (http://127.0.0.1:8000).';
+    if (isLocalServer) {
+      document.querySelector('#modeBadge').textContent = 'Ejecución local';
+      document.querySelector('#demoHelp').hidden = true;
+      document.querySelector('#localHelp').hidden = false;
+      form.hidden = false;
+      status.hidden = false;
+      urlInput.disabled = false;
+      submitButton.disabled = false;
     }
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (!isLocalServer) {
-        status.className = 'mt-4 min-h-6 text-sm text-amber-300';
-        status.textContent = 'Esta función requiere el servidor Python local (iniciar_programa.bat).';
-        return;
-      }
+      if (!isLocalServer) return;
       resultSection.classList.add('hidden');
       status.className = 'mt-4 min-h-6 text-sm text-slate-400';
       status.textContent = 'Descargando y transcribiendo en esta computadora… Puede tardar según la duración del video.';
@@ -145,7 +146,7 @@
         });
         const contentType = response.headers.get('content-type') || '';
         if (!contentType.includes('application/json')) {
-          throw new Error('El servidor local de Python (FastAPI + Faster-Whisper) no está activo en este dominio. Ejecuta iniciar_programa.bat en tu PC para transcribir en local.');
+          throw new Error('El motor de transcripción no está activo. Ejecuta run.bat en la carpeta Transcriptor de Audio y vuelve a abrir la herramienta desde el portal local.');
         }
         const data = await response.json();
         if (!response.ok) throw new Error(data.detail || 'No se pudo completar la transcripción.');

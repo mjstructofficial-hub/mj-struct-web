@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MJ Struct | Ingeniería Estructural, Software Técnico y Automatización</title>
-  <meta name="description" content="MJ Struct: Georreferenciación y Espectros Sísmicos NEC-15 (MapaPro), Simulador Pro Complexivo de Ingeniería Civil, Cubicador de Vigas de Acero, Automatización ETABS y Python." />
+  <meta name="description" content="MJ Struct: MapaPro NEC-15, Simulador Pro Complexivo de Ingeniería Civil, Cubicador de Vigas de Acero, Automatización ETABS y Python." />
   <link rel="icon" type="image/webp" href="./assets/img/Mjstruct.webp" />
   <link rel="apple-touch-icon" href="./assets/img/Mjstruct.png" />
 
@@ -12,6 +12,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.1/dist/katex.min.css" integrity="sha384-WwGtaC6ywCHxA5cstpj/3+xIZvTez8dq2IcBQaXRkenHZ7FVVq1ZROtURwfbtTlG" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.19.1/dist/katex.min.js" integrity="sha384-a1WQdjRj162i159OYq041X6I4K8NenkrI09LlPmiHg0YOb7CR+wJOraXwK9abpnE" crossorigin="anonymous"></script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -99,6 +102,8 @@
       box-shadow: 0 14px 34px -10px rgba(99, 102, 241, 0.32);
     }
 
+    [data-tex] .katex { font-size: 1.05em; }
+
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #070c18; }
     ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; border: 1px solid #334155; }
@@ -183,7 +188,7 @@
       <a href="#contacto" class="mobile-nav-link block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-[#0f172a] hover:text-[#38bdf8]">Contacto y Cotizaciones</a>
       <div class="pt-3 border-t border-slate-700/80 grid grid-cols-1 gap-2">
         <a href="./MapaPro-MJ%20Struct/index.html" class="w-full py-2.5 rounded-xl text-center text-xs font-mono font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-400/40">
-          Abrir MapaPro · Espectro Sísmico NEC-15
+          Abrir MapaPro
         </a>
         <a href="./Cubicar%20de%20vigas/index.html" class="w-full py-2.5 rounded-xl text-center text-xs font-mono font-bold text-[#070c18] bg-[#38bdf8]">
           Abrir Cubicador de Vigas →
@@ -221,7 +226,7 @@
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span>Geo-Sísmica &amp; Espectro NEC-15</span>
+              <span>Abrir MapaPro</span>
             </a>
             <a href="./Cubicar%20de%20vigas/index.html" class="px-6 py-3.5 rounded-xl font-bold text-sm bg-[#1e293b] text-amber-300 border border-amber-500/40 hover:border-amber-400 hover:bg-amber-500/15 transition-all flex items-center gap-2">
               <span>Cubicador de Vigas →</span>
@@ -304,7 +309,7 @@
                 <a href="./MapaPro-MJ%20Struct/index.html" class="flex items-center justify-between p-3 rounded-xl bg-[#0a0f1d] border border-emerald-500/40 hover:border-emerald-400 transition-all">
                   <div class="flex items-center gap-2.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                    <span class="text-white font-bold">1. MapaPro · Geo-Sísmica NEC-15</span>
+                    <span class="text-white font-bold">1. MapaPro NEC-15</span>
                   </div>
                   <span class="text-emerald-300 font-semibold">Abrir App →</span>
                 </a>
@@ -385,7 +390,7 @@
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 INTEGRADO EN WEB · NEC-SE-DS 2015
               </span>
-              <span class="text-xs font-mono font-semibold text-emerald-300">/MapaPro-MJ Struct</span>
+              <span class="text-xs font-mono font-semibold text-emerald-300">Ecuador</span>
             </div>
 
             <div class="flex items-center gap-4 mb-4">
@@ -396,14 +401,14 @@
               </div>
               <div>
                 <h3 class="text-xl sm:text-2xl font-extrabold text-white group-hover:text-emerald-300 transition-colors">
-                  Geo-Sísmica Ecuador NEC-15 (MapaPro)
+                  MapaPro NEC-15
                 </h3>
-                <p class="text-xs font-mono text-emerald-300">Georreferenciación de Proyectos y Espectros de Aceleración</p>
+                <p class="text-xs font-mono text-emerald-300">Mapas y espectros sísmicos</p>
               </div>
             </div>
 
             <p class="text-sm text-slate-200 leading-relaxed mb-5">
-              Plataforma cartográfica e ingenieril que ubica el proyecto por <strong class="text-white">Provincia, Cantón, Parroquia, coordenadas GPS o enlace de Google Maps</strong>. Determina automáticamente la zona sísmica ($Z$), región espectral ($\eta$), factores de sitio ($F_a, F_d, F_s$), período fundamental aproximado ($T_a$), cortante basal ($V = C_s \cdot W$) y grafica los <strong class="text-emerald-300">espectros horizontales elásticos e inelásticos NEC-15</strong> con ficha técnica exportable.
+              Ubica el proyecto por <strong class="text-white">provincia, cantón, parroquia, coordenadas o enlace de Google Maps</strong>. Consulta la zona sísmica (<span data-tex="Z">Z</span>), la región espectral (<span data-tex="\eta">η</span>) y los factores de sitio (<span data-tex="F_a, F_d, F_s">Fₐ, F<sub>d</sub>, Fₛ</span>). Con los datos de la estructura, calcula el período fundamental aproximado (<span data-tex="T_a">Tₐ</span>) y el coeficiente de corte basal (<span data-tex="C_s">Cₛ</span>). Grafica los <strong class="text-emerald-300">espectros horizontales elástico y de diseño</strong> y exporta la ficha técnica.
             </p>
 
             <div class="flex flex-wrap gap-2 mb-6">
@@ -414,7 +419,7 @@
           </div>
 
           <a href="./MapaPro-MJ%20Struct/index.html" class="w-full py-3.5 px-5 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-400 to-teal-300 text-[#070c18] hover:from-emerald-300 hover:to-white shadow-glow-emerald transition-all flex items-center justify-center gap-2">
-            <span>Abrir Geo-Sísmica Ecuador NEC-15</span>
+            <span>Abrir MapaPro</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
@@ -495,7 +500,7 @@
             </div>
 
             <p class="text-sm text-slate-200 leading-relaxed mb-5">
-              Sistema especializado para control y cubicación de acero estructural ($\rho = 7850\text{ kg/m}^3$) para transporte y montaje en obra. Incluye catálogo de perfiles <strong class="text-white">IPE (80-600), HEA, HEB, IPN, W y tubulares HSS (ASTM A500)</strong>, cálculo de <strong class="text-amber-300">vigas armadas soldadas, columnas cajón (2 canales U), correas G/U</strong>, descuento exacto de peso por destajes en patines y exportación a Excel, CSV y PDF.
+              Sistema especializado para control y cubicación de acero estructural (<span data-tex="\rho = 7850\,\mathrm{kg/m^3}">ρ = 7850 kg/m³</span>) para transporte y montaje en obra. Incluye catálogo de perfiles <strong class="text-white">IPE (80-600), HEA, HEB, IPN, W y tubulares HSS (ASTM A500)</strong>, cálculo de <strong class="text-amber-300">vigas armadas soldadas, columnas cajón (2 canales U), correas G/U</strong>, descuento exacto de peso por destajes en patines y exportación a Excel, CSV y PDF.
             </p>
 
             <div class="flex flex-wrap gap-2 mb-6">
@@ -627,35 +632,35 @@
                   <span class="font-mono font-bold text-emerald-400">02.</span>
                   <div>
                     <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Materiales</span></strong>
-                    <span class="text-slate-300">Hormigón ($f'_c = 140$ a $500\text{ kg/cm}^2$), Acero de refuerzo ASTM A615/A706, Acero estructural A36/A572/A992/HSS A500 y Mampostería.</span>
+                    <span class="text-slate-300">Hormigón (<span data-tex="f'_c = 140\text{ a }500\,\mathrm{kg/cm^2}">f′<sub>c</sub> = 140 a 500 kg/cm²</span>), acero de refuerzo ASTM A615/A706, acero estructural A36/A572/A992/HSS A500 y mampostería.</span>
                   </div>
                 </div>
                 <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
                   <span class="font-mono font-bold text-emerald-400">03.</span>
                   <div>
                     <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Secciones</span> (Frame)</strong>
-                    <span class="text-slate-300">Vigas principales, secundarias, de borde y columnas en H.A. y Acero (Perfiles I y Tubos HSS), área teórica, inercia $I_{33}$ y modificadores.</span>
+                    <span class="text-slate-300">Vigas principales, secundarias, de borde y columnas en H.A. y acero (perfiles I y tubos HSS), área teórica, inercia <span data-tex="I_{33}">I₃₃</span> y modificadores.</span>
                   </div>
                 </div>
                 <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
                   <span class="font-mono font-bold text-emerald-400">04.</span>
                   <div>
                     <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Secciones_Area</span></strong>
-                    <span class="text-slate-300">Propiedades de losas (Shell-Thin/Thick, macizas y nervadas) y muros (`Wall`) con modificadores de rigidez ($f_{11}, f_{22}, m_{11}, m_{22}$).</span>
+                    <span class="text-slate-300">Propiedades de losas (Shell-Thin/Thick, macizas y nervadas) y muros (<code>Wall</code>) con modificadores de rigidez (<span data-tex="f_{11}, f_{22}, m_{11}, m_{22}">f₁₁, f₂₂, m₁₁, m₂₂</span>).</span>
                   </div>
                 </div>
                 <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
                   <span class="font-mono font-bold text-emerald-400">05.</span>
                   <div>
                     <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Cargas_Combinaciones</span></strong>
-                    <span class="text-slate-300">Parámetros sísmicos ($C, K$, excentricidad, fuente de masa / peso reactivo), patrones Dead/Live/Sx/Sy y combinaciones LRFD + Envolvente.</span>
+                    <span class="text-slate-300">Parámetros sísmicos (<span data-tex="C, K">C, K</span>, excentricidad, fuente de masa / peso reactivo), patrones Dead/Live/Sx/Sy y combinaciones LRFD + envolvente.</span>
                   </div>
                 </div>
                 <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
                   <span class="font-mono font-bold text-emerald-400">06-07.</span>
                   <div>
                     <strong class="text-white block"><span class="font-mono text-emerald-300">Geometria_Elementos</span> &amp; <span class="font-mono text-emerald-300">Asignaciones</span></strong>
-                    <span class="text-slate-300">Modelado por intersecciones de grilla de columnas, vigas, muros (`Pier Label`), paños de losa, cargas uniformes ($\text{Ton/m}^2$), apoyos fijos y diafragma rígido `D1`.</span>
+                    <span class="text-slate-300">Modelado por intersecciones de grilla de columnas, vigas, muros (<code>Pier Label</code>), paños de losa, cargas uniformes (<span data-tex="\mathrm{Ton/m^2}">Ton/m²</span>), apoyos fijos y diafragma rígido <code>D1</code>.</span>
                   </div>
                 </div>
               </div>
@@ -1046,6 +1051,15 @@
       }
     }
 
+    function renderPortalMath(container) {
+      if (!window.katex) return;
+      container.querySelectorAll('[data-tex]').forEach(element => {
+        window.katex.render(element.dataset.tex, element, { throwOnError: false });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => renderPortalMath(document.body));
+
     function openProjectModal(projectKey) {
       const modal = document.getElementById('info-modal');
       const title = document.getElementById('modal-title');
@@ -1053,8 +1067,8 @@
 
       if (projectKey === 'cubicador') {
         title.textContent = 'Cubicador de Vigas y Perfiles de Acero (MJ Struct)';
-        body.innerHTML = `
-          <p>Desarrollado para control de peso lineal, transporte y montaje de elementos de acero estructural ($\rho = 7850\text{ kg/m}^3$):</p>
+        body.innerHTML = String.raw`
+          <p>Desarrollado para control de peso lineal, transporte y montaje de elementos de acero estructural (<span data-tex="\rho = 7850\,\mathrm{kg/m^3}">ρ = 7850 kg/m³</span>):</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
             <div class="p-3.5 rounded-xl bg-[#070c18] border border-amber-500/40">
               <div class="text-amber-300 font-bold mb-1">1. Catálogo Comercial Integrado</div>
@@ -1062,11 +1076,11 @@
             </div>
             <div class="p-3.5 rounded-xl bg-[#070c18] border border-amber-500/40">
               <div class="text-amber-300 font-bold mb-1">2. Vigas Armadas y Especiales</div>
-              <div class="text-slate-300">Cálculo de vigas soldadas Tipo I ($h_w = h - 2t_f$), aporte de cordones de soldadura, columnas cajón (2 canales U), correas conformadas en frío G/U y placas planas.</div>
+              <div class="text-slate-300">Cálculo de vigas soldadas Tipo I (<span data-tex="h_w = h - 2t_f">h<sub>w</sub> = h − 2t<sub>f</sub></span>), aporte de cordones de soldadura, columnas cajón (2 canales U), correas conformadas en frío G/U y placas planas.</div>
             </div>
             <div class="p-3.5 rounded-xl bg-[#070c18] border border-amber-500/40 sm:col-span-2">
               <div class="text-amber-300 font-bold mb-1">3. Descuento Exacto por Destajes (Notch / Cope) y Exportación</div>
-              <div class="text-slate-300">Deducción volumétrica automática en 1 o 2 extremos (superior / inferior) según longitud de destaje $L_d$, almacenamiento persistente y exportación directa a Excel (.xls), CSV y PDF.</div>
+              <div class="text-slate-300">Deducción volumétrica automática en 1 o 2 extremos (superior / inferior) según longitud de destaje <span data-tex="L_d">L<sub>d</sub></span>, almacenamiento persistente y exportación directa a Excel (.xls), CSV y PDF.</div>
             </div>
           </div>
         `;
@@ -1098,6 +1112,7 @@
         `;
       }
 
+      renderPortalMath(body);
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     }
