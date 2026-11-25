@@ -4,6 +4,7 @@
 
 # 1. PROTECCIÓN CRÍTICA: Excluir toda la carpeta Simulador Complexivo/
 # Evita exponer bancos JSON con respuestas, configuraciones de licencias e imágenes internas en GitHub público
+/_PRIVADO_NO_PUBLICAR/
 Simulador Complexivo/
 
 # 2. Entornos virtuales pesados de Python (cientos de MB de faster-whisper / ctranslate2)

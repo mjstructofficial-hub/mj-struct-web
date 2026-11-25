@@ -9,13 +9,14 @@ import sys
 import threading
 from contextlib import suppress
 from pathlib import Path
-from urllib.parse import urlparse
+from posixpath import normpath
+from urllib.parse import unquote, urlparse
 
 import imageio_ffmpeg
 import numpy as np
 from faster_whisper import WhisperModel
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -43,29 +44,51 @@ ALLOWED_HOSTS = {
     "facebook.com", "www.facebook.com", "m.facebook.com", "fb.watch",
 }
 
+BLOCKED_PREFIXES = (
+    "/_privado_no_publicar",
+    "/simulador complexivo",
+    "/mapapro-mj struct/_work",
+    "/transcriptor de audio/.venv",
+    "/transcriptor de audio/app.py",
+    "/cubicar de vigas/app",
+    "/cubicar de vigas/gradle",
+    "/.git",
+)
+BLOCKED_SUFFIXES = (".bat", ".lnk", ".pyc")
+
 app = FastAPI(title="Transcriptor local", version="1.0.0")
+
+
+def is_blocked_path(path: str) -> bool:
+    path = "/" + path.lstrip("/").casefold()
+    return path.endswith(BLOCKED_SUFFIXES) or any(
+        path == prefix or path.startswith(prefix + "/") for prefix in BLOCKED_PREFIXES
+    )
+
+
+class WorkspaceStaticFiles(StaticFiles):
+    def lookup_path(self, path: str):
+        full_path, stat_result = super().lookup_path(path)
+        if stat_result is None:
+            return full_path, stat_result
+        try:
+            relative_path = Path(full_path).resolve().relative_to(ROOT_DIR)
+        except (OSError, RuntimeError, ValueError):
+            return "", None
+        if is_blocked_path(relative_path.as_posix()):
+            return "", None
+        return full_path, stat_result
 
 
 @app.middleware("http")
 async def disable_html_cache(request, call_next):
-    from urllib.parse import unquote
     decoded_path = unquote(request.url.path).replace("\\", "/")
-    lower_path = decoded_path.lower()
-    blocked_prefixes = (
-        "/simulador complexivo",
-        "/mapapro-mj struct/_work",
-        "/transcriptor de audio/.venv",
-        "/transcriptor de audio/app.py",
-        "/cubicar de vigas/app",
-        "/cubicar de vigas/gradle",
-        "/.git",
-    )
-    if any(lower_path == p or lower_path.startswith(p + "/") for p in blocked_prefixes) or lower_path.endswith((".bat", ".lnk", ".pyc")):
-        from fastapi.responses import PlainTextResponse
+    normalized_path = normpath("/" + decoded_path.lstrip("/")).casefold()
+    if is_blocked_path(normalized_path):
         return PlainTextResponse("Not Found", status_code=404)
 
     response = await call_next(request)
-    if lower_path == "/" or lower_path.endswith(".html"):
+    if normalized_path == "/" or normalized_path.endswith(".html"):
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
@@ -219,6 +242,6 @@ def transcribe(request: TranscribeRequest) -> dict[str, str]:
 
 # Montar el directorio raíz completo para que Portal, MapaPro, Cubicador y Transcriptor
 # funcionen bajo el mismo servidor local http://127.0.0.1:8000
-app.mount("/", StaticFiles(directory=str(ROOT_DIR), html=True), name="workspace_root")
+app.mount("/", WorkspaceStaticFiles(directory=str(ROOT_DIR), html=True), name="workspace_root")
 
 
