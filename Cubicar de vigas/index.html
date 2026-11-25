@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control y Cubicador de Vigas para Montaje | MJ Struct</title>
+  <meta name="description" content="Cubicador de perfiles de acero comerciales (IPE, HEA, HEB, IPN, W, HSS), vigas armadas, vigas especiales, columnas cajón, correas G/U, placas y destajes para transporte y montaje en obra." />
+  <link rel="icon" type="image/webp" href="../assets/img/Mjstruct.webp" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate950: '#090d16',
+            slate900: '#0f172a',
+            slate800: '#1e293b',
+            slate700: '#334155',
+            steelBlue: '#2563eb',
+            skyLight: '#38bdf8',
+            amberWarn: '#f59e0b',
+            emeraldOk: '#10b981',
+            greenTon: '#4ade80'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .bg-grid-steel {
+      background-size: 42px 42px;
+      background-image:
+        linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(245, 158, 11, 0.04) 1px, transparent 1px);
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #070c18; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; border: 1px solid #334155; }
+    ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+  </style>
+</head>
+<body class="bg-[#0f172a] text-slate-100 min-h-screen flex flex-col bg-grid-steel">
+
+  <!-- ==================== BARRA SUPERIOR MJ STRUCT ==================== -->
+  <header class="sticky top-0 z-50 bg-[#070c18]/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <a href="../index.html" class="flex items-center gap-3 group">
+          <img src="../assets/img/Mjstruct.webp" alt="MJ Struct" class="w-11 h-11 rounded-xl object-cover border-2 border-[#38bdf8]/70" />
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-lg sm:text-xl font-extrabold text-white group-hover:text-[#38bdf8] transition-colors">
+                CUBICADOR <span class="text-amber-400">DE VIGAS</span>
+              </span>
+              <span class="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                WEB + APK SYNC
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 font-mono">Control de Acero Comercial, Vigas Armadas, Destajes y Montaje</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Botones de Exportación y Retorno -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="exportCsv(false)" class="px-3 py-2 rounded-xl text-xs font-mono font-bold bg-[#1e293b] text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/20 transition-all">
+          CSV Compacto
+        </button>
+        <button type="button" onclick="exportCsv(true)" class="px-3 py-2 rounded-xl text-xs font-mono font-bold bg-[#1e293b] text-[#38bdf8] border border-[#38bdf8]/40 hover:bg-[#38bdf8]/20 transition-all">
+          CSV Detallado
+        </button>
+        <button type="button" onclick="exportExcelXml(false)" class="px-3 py-2 rounded-xl text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 hover:bg-emerald-500/30 transition-all">
+          Excel (.xls)
+        </button>
+        <button type="button" onclick="printPdfReport()" class="px-3 py-2 rounded-xl text-xs font-mono font-bold bg-amber-400 text-[#090d16] hover:bg-amber-300 transition-all">
+          Imprimir / PDF
+        </button>
+        <a href="../index.html" class="px-3.5 py-2 rounded-xl text-xs font-mono font-bold bg-[#1e293b] text-slate-200 border border-slate-700 hover:border-[#38bdf8] hover:text-[#38bdf8] transition-all">
+          ← Portal MJ Struct
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- 1. TARJETAS DE RESUMEN DE TONELAJE -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="p-4 rounded-2xl bg-[#1e293b] border border-slate-700">
+        <div class="text-xs font-mono text-slate-400 uppercase">Total Piezas</div>
+        <div id="sum-pieces" class="text-2xl sm:text-3xl font-extrabold text-white font-mono mt-1">0 u</div>
+        <div class="text-[11px] text-slate-400 font-mono mt-0.5">Elementos en lista</div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-[#1e293b] border border-slate-700">
+        <div class="text-xs font-mono text-slate-400 uppercase">Longitud Acumulada</div>
+        <div id="sum-length" class="text-2xl sm:text-3xl font-extrabold text-[#38bdf8] font-mono mt-1">0.00 m</div>
+        <div class="text-[11px] text-slate-400 font-mono mt-0.5">Metros lineales</div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-[#1e293b] border border-slate-700">
+        <div class="text-xs font-mono text-slate-400 uppercase">Peso Neto Total</div>
+        <div id="sum-kg" class="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono mt-1">0.00 kg</div>
+        <div id="sum-deduction" class="text-[11px] text-rose-400 font-mono mt-0.5">Destajes: -0.00 kg</div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-[#1e293b] border-2 border-emerald-500/50">
+        <div class="text-xs font-mono text-emerald-300 uppercase font-bold">Tonelaje de Despacho</div>
+        <div id="sum-ton" class="text-2xl sm:text-3xl font-extrabold text-[#4ade80] font-mono mt-1">0.000 t</div>
+        <div class="text-[11px] text-emerald-300/80 font-mono mt-0.5">ρ = 7850 kg/m³</div>
+      </div>
+    </section>
+
+    <!-- 2. SELECTOR DE LAS 6 PESTAÑAS ESTRUCTURALES DE LA APK -->
+    <section class="bg-[#1e293b] rounded-2xl border border-slate-700 p-4 sm:p-6 space-y-6">
+      <div>
+        <div class="text-xs font-mono font-bold uppercase tracking-wider text-amber-400 mb-2.5">
+          // AÑADIR ELEMENTO ESTRUCTURAL A LA LISTA DE MONTAJE
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2" id="main-tabs">
+          <button type="button" onclick="selectTab(0)" data-tab="0" class="tab-btn py-2.5 px-3 rounded-xl text-xs font-mono font-bold bg-[#2563eb] text-white border border-[#38bdf8] transition-all">
+            1. V. Principales
+          </button>
+          <button type="button" onclick="selectTab(1)" data-tab="1" class="tab-btn py-2.5 px-3 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-[#38bdf8] transition-all">
+            2. V. Secundarias
+          </button>
+          <button type="button" onclick="selectTab(2)" data-tab="2" class="tab-btn py-2.5 px-3 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-[#38bdf8] transition-all">
+            3. Columnas
+          </button>
+          <button type="button" onclick="selectTab(3)" data-tab="3" class="tab-btn py-2.5 px-3 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-[#38bdf8] transition-all">
+            4. Otros (G / U)
+          </button>
+          <button type="button" onclick="selectTab(4)" data-tab="4" class="tab-btn py-2.5 px-3 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-[#38bdf8] transition-all">
+            5. Placas
+          </button>
+          <button type="button" onclick="selectTab(5)" data-tab="5" class="tab-btn py-2.5 px-3 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-[#38bdf8] transition-all">
+            6. Vigas Especiales
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-modo (Comercial vs Armada / Cajón) -->
+      <div id="submode-container" class="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-700/80">
+        <span class="text-xs font-mono text-slate-300">Tipo de Sección:</span>
+        <button type="button" id="btn-sub-0" onclick="selectSubMode(0)" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-amber-400 text-[#090d16] transition-all">
+          Catálogo Comercial (IPE / HEA / HEB / W / HSS)
+        </button>
+        <button type="button" id="btn-sub-1" onclick="selectSubMode(1)" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-amber-400 transition-all">
+          Viga Armada Soldada (Placas)
+        </button>
+      </div>
+
+      <!-- FORMULARIO DINÁMICO -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <div class="lg:col-span-8 space-y-4">
+
+          <!-- Marca, Longitud y Cantidad -->
+          <div id="form-standard-top" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-mono text-slate-300 mb-1">Marca del Elemento</label>
+              <input id="inp-mark" type="text" value="VP-1" oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090d16] border border-slate-700 text-sm font-mono font-bold text-white focus:outline-none focus:border-[#38bdf8]" />
+            </div>
+            <div id="field-length-standard">
+              <label class="block text-xs font-mono text-slate-300 mb-1">Longitud Unitaria (mm)</label>
+              <input id="inp-length" type="number" step="1" min="1" value="12000" oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090d16] border border-slate-700 text-sm font-mono text-white focus:outline-none focus:border-[#38bdf8]" />
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-300 mb-1">Cantidad (Piezas)</label>
+              <input id="inp-qty" type="number" step="1" min="1" value="1" oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090d16] border border-slate-700 text-sm font-mono text-white focus:outline-none focus:border-[#38bdf8]" />
+            </div>
+          </div>
+
+          <!-- PANEL A: SELECTOR DE PERFIL COMERCIAL -->
+          <div id="panel-commercial" class="p-4 rounded-xl bg-[#090d16] border border-slate-700 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-mono text-slate-400 mb-1">Filtrar Serie de Perfil</label>
+                <select id="inp-series-filter" onchange="filterCommercialSeries()" class="w-full px-3 py-2.5 rounded-xl bg-[#1e293b] border border-slate-700 text-xs font-mono text-amber-300">
+                  <option value="ALL">Todas las series (65 perfiles)</option>
+                  <option value="IPE">Serie IPE (IPE 80 - IPE 600)</option>
+                  <option value="HEA">Serie HEA (HEA 100 - HEA 300)</option>
+                  <option value="HEB">Serie HEB (HEB 100 - HEB 300)</option>
+                  <option value="IPN">Serie IPN (IPN 100 - IPN 200)</option>
+                  <option value="W">Perfiles Americanos W (W8 - W16)</option>
+                  <option value="HSS">Tubulares Estructurales HSS (ASTM A500)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-mono text-slate-400 mb-1">Seleccionar Perfil Comercial</label>
+                <select id="inp-commercial-profile" onchange="updateLivePreview()" class="w-full px-3 py-2.5 rounded-xl bg-[#1e293b] border border-[#38bdf8]/50 text-sm font-mono font-bold text-white"></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL B: VIGA ARMADA (h, b, tf, tw, r) -->
+          <div id="panel-armada" class="hidden p-4 rounded-xl bg-[#090d16] border border-amber-500/40 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold text-amber-300">Dimensiones de Viga Armada Tipo I (mm)</span>
+              <button type="button" onclick="saveCurrentProfileTemplate()" class="px-3 py-1 rounded-lg text-[11px] font-mono bg-amber-500/20 text-amber-300 border border-amber-400/40 hover:bg-amber-500/30">
+                + Guardar Plantilla
+              </button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Peralte h (mm)</label>
+                <input id="inp-arm-h" type="number" step="1" value="400" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Patín b (mm)</label>
+                <input id="inp-arm-b" type="number" step="1" value="180" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Esp. Patín tf (mm)</label>
+                <input id="inp-arm-tf" type="number" step="0.5" value="14" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Esp. Alma tw (mm)</label>
+                <input id="inp-arm-tw" type="number" step="0.5" value="8" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Radio/Sold. r (mm)</label>
+                <input id="inp-arm-r" type="number" step="0.5" value="0" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+            </div>
+            <div id="saved-templates-bar" class="pt-2 flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- PANEL C: COLUMNA CAJÓN (2 CANALES U) -->
+          <div id="panel-boxcol" class="hidden p-4 rounded-xl bg-[#090d16] border border-amber-500/40 space-y-3">
+            <span class="text-xs font-mono font-bold text-amber-300">Columna Armada en Cajón (2 Canales U soldados)</span>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Altura H (mm)</label>
+                <input id="inp-box-h" type="number" step="1" value="200" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Ancho Canal B (mm)</label>
+                <input id="inp-box-b" type="number" step="1" value="75" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Espesor t (mm)</label>
+                <input id="inp-box-t" type="number" step="0.5" value="4.0" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL D: CORREAS G / CANALES U -->
+          <div id="panel-coldformed" class="hidden p-4 rounded-xl bg-[#090d16] border border-[#38bdf8]/40 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-mono text-slate-400 mb-1">Preset de Correa G / Canal U</label>
+                <select id="inp-cf-preset" onchange="applyCfPreset()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-xs font-mono text-[#38bdf8]"></select>
+              </div>
+              <div class="grid grid-cols-4 gap-2">
+                <div>
+                  <label class="block text-[10px] font-mono text-slate-400 mb-1">H (mm)</label>
+                  <input id="inp-cf-h" type="number" value="100" oninput="updateLivePreview()" class="w-full px-2 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-xs font-mono text-white" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-mono text-slate-400 mb-1">B (mm)</label>
+                  <input id="inp-cf-b" type="number" value="50" oninput="updateLivePreview()" class="w-full px-2 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-xs font-mono text-white" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-mono text-slate-400 mb-1">Pestaña C</label>
+                  <input id="inp-cf-c" type="number" value="15" oninput="updateLivePreview()" class="w-full px-2 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-xs font-mono text-white" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-mono text-slate-400 mb-1">Esp. t</label>
+                  <input id="inp-cf-t" type="number" step="0.1" value="2.0" oninput="updateLivePreview()" class="w-full px-2 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-xs font-mono text-white" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL E: PLACAS Y CARTELAS -->
+          <div id="panel-placa" class="hidden p-4 rounded-xl bg-[#090d16] border border-emerald-500/40 space-y-3">
+            <span class="text-xs font-mono font-bold text-emerald-300">Dimensiones de Placa Base / Cartela de Acero</span>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Espesor e (mm)</label>
+                <input id="inp-pl-e" type="number" step="0.5" value="12" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Ancho A (mm)</label>
+                <input id="inp-pl-a" type="number" step="1" value="250" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Largo L (mm)</label>
+                <input id="inp-pl-l" type="number" step="1" value="400" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL F: 3 LONGITUDES PARA VIGAS ESPECIALES -->
+          <div id="panel-special-lengths" class="hidden p-4 rounded-xl bg-[#090d16] border border-[#38bdf8]/40 space-y-3">
+            <span class="text-xs font-mono font-bold text-[#38bdf8]">Longitudes Independientes por Placa (Viga Especial)</span>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">L Patín Superior (mm)</label>
+                <input id="inp-sp-top" type="number" step="1" value="4000" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">L Alma Central (mm)</label>
+                <input id="inp-sp-web" type="number" step="1" value="4500" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">L Patín Inferior (mm)</label>
+                <input id="inp-sp-bot" type="number" step="1" value="5000" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL G: DESTAJES EN PATINES -->
+          <div id="panel-destaje" class="hidden p-4 rounded-xl bg-[#090d16] border border-rose-500/40 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="flex items-center gap-2.5 cursor-pointer">
+                <input id="inp-has-destaje" type="checkbox" onchange="updateLivePreview()" class="w-4 h-4 rounded accent-amber-400" />
+                <span class="text-xs font-mono font-bold text-amber-300">Aplicar Corte de Destaje en Extremos (Cope / Notch)</span>
+              </label>
+              <span id="preview-destaje-deduction" class="text-xs font-mono text-rose-400 font-bold">-0.00 kg</span>
+            </div>
+
+            <div id="destaje-fields" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Longitud Destaje Ld (mm)</label>
+                <input id="inp-dest-long" type="number" value="80" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Altura Destaje Hd (mm)</label>
+                <input id="inp-dest-alt" type="number" value="35" oninput="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-sm font-mono text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Configuración de Extremos</label>
+                <select id="inp-dest-tipo" onchange="updateLivePreview()" class="w-full px-3 py-2 rounded-lg bg-[#1e293b] border border-slate-700 text-xs font-mono text-white">
+                  <option value="2 Extremos (Superior)">2 Extremos (Superior) · 4 aletas</option>
+                  <option value="2 Extremos (Superior e Inferior)">2 Extremos (Superior e Inferior) · 8 aletas</option>
+                  <option value="1 Extremo (Superior)">1 Extremo (Superior) · 2 aletas</option>
+                  <option value="1 Extremo (Superior e Inferior)">1 Extremo (Superior e Inferior) · 4 aletas</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Panel Derecho: Vista Previa del Elemento y Botón Añadir -->
+        <div class="lg:col-span-4 p-5 rounded-2xl bg-[#090d16] border border-slate-700 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <span class="text-xs font-mono text-slate-400 uppercase">Cálculo Previo</span>
+            <span id="preview-cat-badge" class="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-[#2563eb]/30 text-[#38bdf8]">
+              Viga Principal
+            </span>
+          </div>
+
+          <div class="space-y-2 font-mono text-xs">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Dimensiones:</span>
+              <span id="prev-dims" class="text-white font-bold text-right">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Altura libre alma (hw):</span>
+              <span id="prev-hw" class="text-[#38bdf8]">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Peso Lineal / Unitario:</span>
+              <span id="prev-unit-w" class="text-white font-bold">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Peso Bruto:</span>
+              <span id="prev-gross-w" class="text-slate-300">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Descuento Destaje:</span>
+              <span id="prev-notch-w" class="text-rose-400">-0.00 kg</span>
+            </div>
+            <div class="pt-2 border-t border-slate-800 flex justify-between items-baseline">
+              <span class="text-slate-300 font-bold">PESO NETO TOTAL:</span>
+              <div class="text-right">
+                <div id="prev-net-kg" class="text-lg font-extrabold text-amber-400">0.00 kg</div>
+                <div id="prev-net-ton" class="text-xs font-bold text-[#4ade80]">0.000 t</div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" onclick="addElementToQueue()" class="w-full py-3.5 px-5 rounded-xl font-extrabold text-sm bg-gradient-to-r from-[#2563eb] to-[#38bdf8] text-white hover:from-blue-500 hover:to-cyan-300 shadow-lg transition-all flex items-center justify-center gap-2">
+            <span>+ Añadir a Lista de Montaje</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. TABLA DE ELEMENTOS CUBICADOS -->
+    <section class="bg-[#1e293b] rounded-2xl border border-slate-700 p-4 sm:p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+            <span>Planilla Acumulada de Transporte y Montaje</span>
+            <span id="queue-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-[#090d16] text-[#38bdf8] border border-slate-700">0 ítems</span>
+          </h2>
+          <p class="text-xs font-mono text-slate-400">Los datos se guardan automáticamente en este navegador</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="filter-category" onchange="renderQueueTable()" class="px-3 py-2 rounded-xl bg-[#090d16] border border-slate-700 text-xs font-mono text-slate-200">
+            <option value="Todos">Ver Todos</option>
+            <option value="Viga Principal">V. Principales</option>
+            <option value="Viga Secundaria">V. Secundarias</option>
+            <option value="Columna">Columnas</option>
+            <option value="Correa / Canal">Otros (G / U)</option>
+            <option value="Placa">Placas</option>
+            <option value="Vigas especiales">Vigas especiales</option>
+          </select>
+          <button type="button" onclick="clearAllQueue()" class="px-3 py-2 rounded-xl text-xs font-mono font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30 transition-all">
+            Vaciar Lista
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-[#090d16]">
+        <table class="w-full text-left border-collapse font-mono text-xs">
+          <thead class="bg-[#0f172a] text-slate-300 border-b border-slate-800">
+            <tr>
+              <th class="py-3 px-3">#</th>
+              <th class="py-3 px-3">Categoría</th>
+              <th class="py-3 px-3">Tipo</th>
+              <th class="py-3 px-3">Marca</th>
+              <th class="py-3 px-3">Dimensiones</th>
+              <th class="py-3 px-3">Destaje</th>
+              <th class="py-3 px-3 text-right">hw (mm)</th>
+              <th class="py-3 px-3 text-right">L (mm)</th>
+              <th class="py-3 px-3 text-right">Cant.</th>
+              <th class="py-3 px-3 text-right">L. Total (m)</th>
+              <th class="py-3 px-3 text-right">Peso Unit.</th>
+              <th class="py-3 px-3 text-right">Bruto (kg)</th>
+              <th class="py-3 px-3 text-right text-rose-400">Destaje (kg)</th>
+              <th class="py-3 px-3 text-right text-amber-300">Neto (kg)</th>
+              <th class="py-3 px-3 text-right text-[#4ade80]">Total (t)</th>
+              <th class="py-3 px-3 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="queue-tbody" class="divide-y divide-slate-800/80 text-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 border-t border-slate-800/80 text-xs font-mono text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="text-center md:text-left">
+      <span class="text-white font-bold">MJ STRUCT</span> · Herramienta de apoyo técnico. Verifique la cubicación antes del despacho o montaje en obra.
+    </div>
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <a href="../legal.html#terminos" class="hover:text-[#38bdf8] underline decoration-slate-700">Términos y Condiciones</a>
+      <span>·</span>
+      <a href="../legal.html#privacidad" class="hover:text-emerald-300 underline decoration-slate-700">Privacidad (LOPDP)</a>
+      <span>·</span>
+      <a href="../legal.html#cookies" class="hover:text-amber-300 underline decoration-slate-700">Almacenamiento Local</a>
+    </div>
+  </footer>
+
+  <script>
+    const COMMERCIAL_PROFILES = [
+      { name: "IPE 80", h: 80.0, b: 46.0, tf: 5.2, tw: 3.8, w: 6.0 },
+      { name: "IPE 100", h: 100.0, b: 55.0, tf: 5.7, tw: 4.1, w: 8.1 },
+      { name: "IPE 120", h: 120.0, b: 64.0, tf: 6.3, tw: 4.4, w: 10.4 },
+      { name: "IPE 140", h: 140.0, b: 73.0, tf: 6.9, tw: 4.7, w: 12.9 },
+      { name: "IPE 160", h: 160.0, b: 82.0, tf: 7.4, tw: 5.0, w: 15.8 },
+      { name: "IPE 180", h: 180.0, b: 91.0, tf: 8.0, tw: 5.3, w: 18.8 },
+      { name: "IPE 200", h: 200.0, b: 100.0, tf: 8.5, tw: 5.6, w: 22.4 },
+      { name: "IPE 220", h: 220.0, b: 110.0, tf: 9.2, tw: 5.9, w: 26.2 },
+      { name: "IPE 240", h: 240.0, b: 120.0, tf: 9.8, tw: 6.2, w: 30.7 },
+      { name: "IPE 270", h: 270.0, b: 135.0, tf: 10.2, tw: 6.6, w: 36.1 },
+      { name: "IPE 300", h: 300.0, b: 150.0, tf: 10.7, tw: 7.1, w: 42.2 },
+      { name: "IPE 330", h: 330.0, b: 160.0, tf: 11.5, tw: 7.5, w: 49.1 },
+      { name: "IPE 360", h: 360.0, b: 170.0, tf: 12.7, tw: 8.0, w: 57.1 },
+      { name: "IPE 400", h: 400.0, b: 180.0, tf: 13.5, tw: 8.6, w: 66.3 },
+      { name: "IPE 450", h: 450.0, b: 190.0, tf: 14.6, tw: 9.4, w: 77.6 },
+      { name: "IPE 500", h: 500.0, b: 200.0, tf: 16.0, tw: 10.2, w: 90.7 },
+      { name: "IPE 550", h: 550.0, b: 210.0, tf: 17.2, tw: 11.1, w: 106.0 },
+      { name: "IPE 600", h: 600.0, b: 220.0, tf: 19.0, tw: 12.0, w: 122.0 },
+      { name: "HEA 100", h: 96.0, b: 100.0, tf: 8.0, tw: 5.0, w: 16.7 },
+      { name: "HEA 120", h: 114.0, b: 120.0, tf: 8.0, tw: 5.0, w: 19.9 },
+      { name: "HEA 140", h: 133.0, b: 140.0, tf: 8.5, tw: 5.5, w: 24.7 },
+      { name: "HEA 160", h: 152.0, b: 160.0, tf: 9.0, tw: 6.0, w: 30.4 },
+      { name: "HEA 180", h: 171.0, b: 180.0, tf: 9.5, tw: 6.0, w: 35.5 },
+      { name: "HEA 200", h: 190.0, b: 200.0, tf: 10.0, tw: 6.5, w: 42.3 },
+      { name: "HEA 220", h: 210.0, b: 220.0, tf: 11.0, tw: 7.0, w: 50.5 },
+      { name: "HEA 240", h: 230.0, b: 240.0, tf: 12.0, tw: 7.5, w: 60.3 },
+      { name: "HEA 260", h: 250.0, b: 260.0, tf: 12.5, tw: 7.5, w: 68.2 },
+      { name: "HEA 280", h: 270.0, b: 280.0, tf: 13.0, tw: 8.0, w: 76.4 },
+      { name: "HEA 300", h: 290.0, b: 300.0, tf: 14.0, tw: 8.5, w: 88.3 },
+      { name: "HEB 100", h: 100.0, b: 100.0, tf: 10.0, tw: 6.0, w: 20.4 },
+      { name: "HEB 120", h: 120.0, b: 120.0, tf: 11.0, tw: 6.5, w: 26.7 },
+      { name: "HEB 140", h: 140.0, b: 140.0, tf: 12.0, tw: 7.0, w: 33.7 },
+      { name: "HEB 160", h: 160.0, b: 160.0, tf: 13.0, tw: 8.0, w: 42.6 },
+      { name: "HEB 180", h: 180.0, b: 180.0, tf: 14.0, tw: 8.5, w: 51.2 },
+      { name: "HEB 200", h: 200.0, b: 200.0, tf: 15.0, tw: 9.0, w: 61.3 },
+      { name: "HEB 220", h: 220.0, b: 220.0, tf: 16.0, tw: 9.5, w: 71.5 },
+      { name: "HEB 240", h: 240.0, b: 240.0, tf: 17.0, tw: 10.0, w: 83.2 },
+      { name: "HEB 260", h: 260.0, b: 260.0, tf: 17.5, tw: 10.0, w: 93.0 },
+      { name: "HEB 280", h: 280.0, b: 280.0, tf: 18.0, tw: 10.5, w: 103.0 },
+      { name: "HEB 300", h: 300.0, b: 300.0, tf: 19.0, tw: 11.0, w: 117.0 },
+      { name: "IPN 100", h: 100.0, b: 50.0, tf: 6.8, tw: 4.5, w: 8.34 },
+      { name: "IPN 120", h: 120.0, b: 58.0, tf: 7.7, tw: 5.1, w: 11.1 },
+      { name: "IPN 140", h: 140.0, b: 66.0, tf: 8.6, tw: 5.7, w: 14.3 },
+      { name: "IPN 160", h: 160.0, b: 74.0, tf: 9.5, tw: 6.3, w: 17.9 },
+      { name: "IPN 180", h: 180.0, b: 82.0, tf: 10.4, tw: 6.9, w: 21.9 },
+      { name: "IPN 200", h: 200.0, b: 90.0, tf: 11.3, tw: 7.5, w: 26.2 },
+      { name: "W8x10", h: 200.4, b: 100.1, tf: 5.2, tw: 4.3, w: 14.9 },
+      { name: "W8x18", h: 206.8, b: 133.4, tf: 8.4, tw: 5.8, w: 26.8 },
+      { name: "W10x12", h: 251.5, b: 100.6, tf: 5.3, tw: 4.8, w: 17.9 },
+      { name: "W10x22", h: 258.3, b: 146.1, tf: 9.1, tw: 6.6, w: 32.7 },
+      { name: "W12x14", h: 302.5, b: 100.8, tf: 5.7, tw: 5.1, w: 20.8 },
+      { name: "W12x26", h: 310.4, b: 164.8, tf: 9.7, tw: 5.8, w: 38.7 },
+      { name: "W14x22", h: 348.7, b: 127.0, tf: 8.5, tw: 5.8, w: 32.7 },
+      { name: "W16x26", h: 403.6, b: 139.7, tf: 8.8, tw: 6.4, w: 38.7 },
+      { name: "HSS 100x100x3.0 mm", h: 100.0, b: 100.0, tf: 3.0, tw: 3.0, w: 8.96 },
+      { name: "HSS 100x100x4.0 mm", h: 100.0, b: 100.0, tf: 4.0, tw: 4.0, w: 11.7 },
+      { name: "HSS 150x150x4.0 mm", h: 150.0, b: 150.0, tf: 4.0, tw: 4.0, w: 18.0 },
+      { name: "HSS 150x150x6.0 mm", h: 150.0, b: 150.0, tf: 6.0, tw: 6.0, w: 26.4 },
+      { name: "HSS 200x100x5.0 mm", h: 200.0, b: 100.0, tf: 5.0, tw: 5.0, w: 22.3 },
+      { name: "HSS 200x200x6.0 mm", h: 200.0, b: 200.0, tf: 6.0, tw: 6.0, w: 35.8 },
+      { name: "HSS 200x200x8.0 mm", h: 200.0, b: 200.0, tf: 8.0, tw: 8.0, w: 46.9 },
+      { name: "HSS 250x250x6.0 mm", h: 250.0, b: 250.0, tf: 6.0, tw: 6.0, w: 45.2 },
+      { name: "HSS 250x250x8.0 mm", h: 250.0, b: 250.0, tf: 8.0, tw: 8.0, w: 59.5 },
+      { name: "HSS 300x300x6.0 mm", h: 300.0, b: 300.0, tf: 6.0, tw: 6.0, w: 55.39 },
+      { name: "HSS 300x300x8.0 mm", h: 300.0, b: 300.0, tf: 8.0, tw: 8.0, w: 73.35 },
+      { name: "HSS 300x300x9.5 mm", h: 300.0, b: 300.0, tf: 9.5, tw: 9.5, w: 86.66 },
+      { name: "HSS 300x300x10.0 mm", h: 300.0, b: 300.0, tf: 10.0, tw: 10.0, w: 91.06 },
+      { name: "HSS 300x300x12.0 mm", h: 300.0, b: 300.0, tf: 12.0, tw: 12.0, w: 108.52 },
+      { name: "HSS 300x300x12.7 mm", h: 300.0, b: 300.0, tf: 12.7, tw: 12.7, w: 114.57 }
+    ];
+
+    const COLD_FORMED_PRESETS = [
+      { label: "Correa G 100x50x15x2.0 mm", h: 100, b: 50, c: 15, t: 2.0 },
+      { label: "Correa G 125x50x15x2.0 mm", h: 125, b: 50, c: 15, t: 2.0 },
+      { label: "Correa G 150x50x17x2.0 mm", h: 150, b: 50, c: 17, t: 2.0 },
+      { label: "Correa G 200x65x20x2.5 mm", h: 200, b: 65, c: 20, t: 2.5 },
+      { label: "Canal U 100x50x3.0 mm", h: 100, b: 50, c: 0, t: 3.0 },
+      { label: "Canal U 150x50x4.0 mm", h: 150, b: 50, c: 0, t: 4.0 }
+    ];
+
+    let activeTab = 0;
+    let activeSubMode = 0;
+    let beamQueue = JSON.parse(localStorage.getItem('mj_cubicador_queue_v1') || '[]');
+    let savedTemplates = JSON.parse(localStorage.getItem('mj_cubicador_templates_v1') || '[]');
+
+    function escHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escXml(str) {
+      return escHtml(str).replace(/&#39;/g, '&apos;');
+    }
+
+    function escCsv(val) {
+      const s = String(val ?? '');
+      if (/[;"\r\n]/.test(s)) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
+    function normalizeSavedQueue() {
+      let changed = false;
+      beamQueue = beamQueue.map(item => {
+        if (!item || typeof item !== 'object') return item;
+        const qty = Math.max(1, Number(item.quantity) || 1);
+        const lenMm = Math.max(1, Number(item.lengthMm) || 1000);
+        const netKg = Math.max(0, Number(item.totalWeightKg) || 0);
+        if (item.category === 'Vigas especiales' && lenMm > 0) {
+          const expectedUnit = (netKg / qty) / (lenMm / 1000.0);
+          if (Math.abs((Number(item.unitWeightKgM) || 0) - expectedUnit) > 1e-4) {
+            item.unitWeightKgM = expectedUnit;
+            changed = true;
+          }
+        }
+        return item;
+      });
+      if (changed) {
+        localStorage.setItem('mj_cubicador_queue_v1', JSON.stringify(beamQueue));
+      }
+    }
+    normalizeSavedQueue();
+
+    function fmt(n, dec = 1) {
+      if (Number.isInteger(n) || Math.abs(n - Math.round(n)) < 1e-6) return String(Math.round(n));
+      return Number(n).toFixed(dec);
+    }
+
+    function calcArmadaHw(h, tf) { return Math.max(0, h - 2 * tf); }
+    function calcArmadaWeightPerM(h, b, tf, tw, r) {
+      const hw = calcArmadaHw(h, tf);
+      const areaPlates = 2 * (b * tf) + (hw * tw);
+      const areaFillets = r > 0 ? (4 - Math.PI) * (r * r) : 0;
+      return ((areaPlates + areaFillets) * 1e-6) * 7850.0;
+    }
+    function calcBoxColWeightPerM(h, b, t) {
+      const p1 = Math.max(0, h + 2 * b - 2 * t);
+      return 2 * (p1 * t * 0.00785);
+    }
+    function calcColdFormedWeightPerM(h, b, c, t) {
+      const strip = Math.max(0, h + 2 * b + 2 * c);
+      return strip * t * 0.00785;
+    }
+    function calcPlateWeightKg(e, a, l) {
+      return (e * a * l * 1e-9) * 7850.0;
+    }
+    function calcSpecialBeamWeightKg(h, b, tf, tw, topL, webL, botL) {
+      const hw = calcArmadaHw(h, tf);
+      return calcPlateWeightKg(tf, b, topL) + calcPlateWeightKg(tw, hw, webL) + calcPlateWeightKg(tf, b, botL);
+    }
+    function calcNotchDeductionKg(b, tw, tf, ldMm, notchType, qty) {
+      const bNotch = Math.max(0, (b - tw) / 2.0);
+      const volPerNotch = bNotch * tf * ldMm;
+      let count = 4;
+      if (notchType === "1 Extremo (Superior)") count = 2;
+      else if (notchType === "2 Extremos (Superior)") count = 4;
+      else if (notchType === "1 Extremo (Superior e Inferior)") count = 4;
+      else if (notchType === "2 Extremos (Superior e Inferior)") count = 8;
+      return (volPerNotch * count * qty * 1e-9) * 7850.0;
+    }
+
+    function filterCommercialSeries() {
+      const series = document.getElementById('inp-series-filter').value;
+      const sel = document.getElementById('inp-commercial-profile');
+      sel.innerHTML = '';
+      COMMERCIAL_PROFILES.forEach((p, idx) => {
+        if (series === 'ALL' || p.name.startsWith(series)) {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.textContent = `${p.name} — ${p.w.toFixed(2)} kg/m (${fmt(p.h)}x${fmt(p.b)}x${fmt(p.tf)}x${fmt(p.tw)})`;
+          if (p.name === 'IPE 400') opt.selected = true;
+          sel.appendChild(opt);
+        }
+      });
+      updateLivePreview();
+    }
+
+    function initColdFormedPresets() {
+      const sel = document.getElementById('inp-cf-preset');
+      sel.innerHTML = COLD_FORMED_PRESETS.map((p, i) => `<option value="${i}">${p.label}</option>`).join('');
+    }
+
+    function applyCfPreset() {
+      const idx = parseInt(document.getElementById('inp-cf-preset').value) || 0;
+      const p = COLD_FORMED_PRESETS[idx];
+      if (!p) return;
+      document.getElementById('inp-cf-h').value = p.h;
+      document.getElementById('inp-cf-b').value = p.b;
+      document.getElementById('inp-cf-c').value = p.c;
+      document.getElementById('inp-cf-t').value = p.t;
+      updateLivePreview();
+    }
+
+    function selectTab(tabIdx) {
+      activeTab = tabIdx;
+      activeSubMode = 0;
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const idx = parseInt(btn.getAttribute('data-tab'));
+        if (idx === tabIdx) {
+          btn.className = 'tab-btn py-2.5 px-3 rounded-xl text-xs font-mono font-bold bg-[#2563eb] text-white border border-[#38bdf8] transition-all';
+        } else {
+          btn.className = 'tab-btn py-2.5 px-3 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-[#38bdf8] transition-all';
+        }
+      });
+
+      const defaultMarks = ['VP-1', 'VS-1', 'COL-1', 'CORREA-1', 'PB-1', 'VE-1'];
+      document.getElementById('inp-mark').value = defaultMarks[tabIdx] || 'ELEM-1';
+
+      const subContainer = document.getElementById('submode-container');
+      const btnSub0 = document.getElementById('btn-sub-0');
+      const btnSub1 = document.getElementById('btn-sub-1');
+
+      if (tabIdx === 0 || tabIdx === 1 || tabIdx === 5) {
+        subContainer.classList.remove('hidden');
+        btnSub0.textContent = 'Catálogo Comercial (IPE / HEA / HEB / W / HSS)';
+        btnSub1.textContent = 'Viga Armada Soldada (Placas)';
+      } else if (tabIdx === 2) {
+        subContainer.classList.remove('hidden');
+        btnSub0.textContent = 'Catálogo Comercial (Perfiles W / HEB / HSS)';
+        btnSub1.textContent = 'Columna Armada Cajón (2 Canales U)';
+      } else {
+        subContainer.classList.add('hidden');
+      }
+
+      selectSubMode(0);
+    }
+
+    function selectSubMode(modeIdx) {
+      activeSubMode = modeIdx;
+      const btn0 = document.getElementById('btn-sub-0');
+      const btn1 = document.getElementById('btn-sub-1');
+
+      if (modeIdx === 0) {
+        btn0.className = 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-amber-400 text-[#090d16] transition-all';
+        btn1.className = 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-amber-400 transition-all';
+      } else {
+        btn1.className = 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-amber-400 text-[#090d16] transition-all';
+        btn0.className = 'px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#0f172a] text-slate-300 border border-slate-700 hover:border-amber-400 transition-all';
+      }
+
+      document.getElementById('panel-commercial').classList.toggle('hidden', !((activeTab === 0 || activeTab === 1 || activeTab === 2 || activeTab === 5) && activeSubMode === 0));
+      document.getElementById('panel-armada').classList.toggle('hidden', !((activeTab === 0 || activeTab === 1 || activeTab === 5) && activeSubMode === 1));
+      document.getElementById('panel-boxcol').classList.toggle('hidden', !(activeTab === 2 && activeSubMode === 1));
+      document.getElementById('panel-coldformed').classList.toggle('hidden', activeTab !== 3);
+      document.getElementById('panel-placa').classList.toggle('hidden', activeTab !== 4);
+      document.getElementById('panel-special-lengths').classList.toggle('hidden', activeTab !== 5);
+      document.getElementById('field-length-standard').classList.toggle('hidden', activeTab === 4 || activeTab === 5);
+      document.getElementById('panel-destaje').classList.toggle('hidden', !(activeTab === 1 || activeTab === 5));
+
+      updateLivePreview();
+    }
+
+    function readPositive(id, label, invalidList) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const raw = el.value.trim();
+      const v = Number(raw);
+      if (raw === '' || !Number.isFinite(v) || v <= 0) {
+        invalidList.push(label);
+        return 0;
+      }
+      return v;
+    }
+
+    function readNonNegative(id, label, invalidList) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const raw = el.value.trim();
+      if (raw === '') return 0;
+      const v = Number(raw);
+      if (!Number.isFinite(v) || v < 0) {
+        invalidList.push(label);
+        return 0;
+      }
+      return v;
+    }
+
+    function computeCurrentDraft() {
+      const invalidFields = [];
+      const mark = document.getElementById('inp-mark').value.trim() || 'ELEM-1';
+      const qtyRaw = Number(document.getElementById('inp-qty').value);
+      if (!Number.isFinite(qtyRaw) || qtyRaw < 1) {
+        invalidFields.push('Cantidad (mínimo 1)');
+      }
+      const qty = Math.max(1, Math.floor(qtyRaw) || 1);
+      const needsStdLength = activeTab !== 4 && activeTab !== 5;
+      const lengthMm = needsStdLength ? readPositive('inp-length', 'Longitud L (mm)', invalidFields) : 1000;
+
+      const catNames = ['Viga Principal', 'Viga Secundaria', 'Columna', 'Correa / Canal', 'Placa', 'Vigas especiales'];
+      const category = catNames[activeTab];
+
+      let type = 'Comercial';
+      let h = 0, hw = 0, b = 0, tf = 0, tw = 0, r = 0;
+      let dims = '';
+      let unitWeightKgM = 0;
+      let grossWeightKg = 0;
+      let notchDeductionKg = 0;
+      let hasDestaje = false;
+      let destLong = 0, destAlt = 0, destTipo = '';
+      let topL = null, webL = null, botL = null;
+      let refLengthMm = lengthMm;
+
+      if (activeTab === 0 || activeTab === 1 || (activeTab === 2 && activeSubMode === 0)) {
+        if (activeSubMode === 0) {
+          const pIdx = parseInt(document.getElementById('inp-commercial-profile').value) || 0;
+          const p = COMMERCIAL_PROFILES[pIdx] || COMMERCIAL_PROFILES[0];
+          type = 'Comercial';
+          h = p.h; b = p.b; tf = p.tf; tw = p.tw; hw = calcArmadaHw(h, tf);
+          dims = `${p.name} (${fmt(h)}x${fmt(b)}x${fmt(tf)}x${fmt(tw)})`;
+          unitWeightKgM = p.w;
+          grossWeightKg = unitWeightKgM * (lengthMm / 1000.0) * qty;
+        } else {
+          type = 'Armada';
+          h = readPositive('inp-arm-h', 'Peralte total h (mm)', invalidFields);
+          b = readPositive('inp-arm-b', 'Ancho patín b (mm)', invalidFields);
+          tf = readPositive('inp-arm-tf', 'Espesor patín tf (mm)', invalidFields);
+          tw = readPositive('inp-arm-tw', 'Espesor alma tw (mm)', invalidFields);
+          r = readNonNegative('inp-arm-r', 'Radio / soldadura r (mm)', invalidFields);
+          if (h > 0 && tf > 0 && h <= 2 * tf) {
+            invalidFields.push('Peralte h debe ser mayor a 2·tf');
+          }
+          hw = calcArmadaHw(h, tf);
+          dims = `${fmt(h)}x${fmt(b)}x${fmt(tf)}x${fmt(tw)}${r > 0 ? ' r=' + fmt(r) : ''}`;
+          unitWeightKgM = invalidFields.length === 0 ? calcArmadaWeightPerM(h, b, tf, tw, r) : 0;
+          grossWeightKg = unitWeightKgM * (lengthMm / 1000.0) * qty;
+        }
+
+        if (activeTab === 1) {
+          hasDestaje = document.getElementById('inp-has-destaje').checked;
+          if (hasDestaje) {
+            destLong = readPositive('inp-dest-long', 'Longitud de destaje Ld (mm)', invalidFields);
+            destAlt = readNonNegative('inp-dest-alt', 'Altura de destaje Hd (mm)', invalidFields);
+            destTipo = document.getElementById('inp-dest-tipo').value;
+            notchDeductionKg = invalidFields.length === 0 ? calcNotchDeductionKg(b, tw, tf, destLong, destTipo, qty) : 0;
+          }
+        }
+      } else if (activeTab === 2 && activeSubMode === 1) {
+        type = 'Columna Cajón';
+        h = readPositive('inp-box-h', 'Altura canal h (mm)', invalidFields);
+        b = readPositive('inp-box-b', 'Ala canal b (mm)', invalidFields);
+        tf = readPositive('inp-box-t', 'Espesor canal t (mm)', invalidFields);
+        tw = tf;
+        hw = Math.max(0, h - 2 * tf);
+        dims = `2 Canales U ${Math.round(h)}x${Math.round(b)}x${fmt(tf)} mm (Cajón)`;
+        unitWeightKgM = invalidFields.length === 0 ? calcBoxColWeightPerM(h, b, tf) : 0;
+        grossWeightKg = unitWeightKgM * (lengthMm / 1000.0) * qty;
+      } else if (activeTab === 3) {
+        type = 'Correa G / Canal';
+        h = readPositive('inp-cf-h', 'Peralte h (mm)', invalidFields);
+        b = readPositive('inp-cf-b', 'Ala b (mm)', invalidFields);
+        const c = readNonNegative('inp-cf-c', 'Pestaña c (mm)', invalidFields);
+        tf = readPositive('inp-cf-t', 'Espesor t (mm)', invalidFields);
+        tw = tf; hw = h;
+        dims = `G/U ${Math.round(h)}x${Math.round(b)}${c > 0 ? 'x' + fmt(c) : ''}x${fmt(tf)} mm`;
+        unitWeightKgM = invalidFields.length === 0 ? calcColdFormedWeightPerM(h, b, c, tf) : 0;
+        grossWeightKg = unitWeightKgM * (lengthMm / 1000.0) * qty;
+      } else if (activeTab === 4) {
+        type = 'Placa';
+        const e = readPositive('inp-pl-e', 'Espesor de placa e (mm)', invalidFields);
+        const a = readPositive('inp-pl-a', 'Ancho de placa A (mm)', invalidFields);
+        const l = readPositive('inp-pl-l', 'Largo de placa L (mm)', invalidFields);
+        h = a; b = l; tf = e; tw = e; hw = 0;
+        refLengthMm = l;
+        dims = `e=${fmt(e)} x ${fmt(a)} x ${fmt(l)} mm`;
+        unitWeightKgM = invalidFields.length === 0 ? calcPlateWeightKg(e, a, l) : 0;
+        grossWeightKg = unitWeightKgM * qty;
+      } else if (activeTab === 5) {
+        topL = readPositive('inp-sp-top', 'Largo patín superior (mm)', invalidFields);
+        webL = readPositive('inp-sp-web', 'Largo alma (mm)', invalidFields);
+        botL = readPositive('inp-sp-bot', 'Largo patín inferior (mm)', invalidFields);
+        refLengthMm = Math.max(topL, webL, botL);
+
+        let catalogScale = 1.0;
+        if (activeSubMode === 0) {
+          const pIdx = parseInt(document.getElementById('inp-commercial-profile').value) || 0;
+          const p = COMMERCIAL_PROFILES[pIdx] || COMMERCIAL_PROFILES[0];
+          type = 'Viga especial · Comercial';
+          h = p.h; b = p.b; tf = p.tf; tw = p.tw; hw = calcArmadaHw(h, tf);
+          dims = `${p.name} (${fmt(h)}x${fmt(b)}x${fmt(tf)}x${fmt(tw)})`;
+          const geomKgM = calcArmadaWeightPerM(h, b, tf, tw, 0);
+          catalogScale = geomKgM > 0 ? (p.w / geomKgM) : 1.0;
+        } else {
+          type = 'Viga especial · Armada';
+          h = readPositive('inp-arm-h', 'Peralte total h (mm)', invalidFields);
+          b = readPositive('inp-arm-b', 'Ancho patín b (mm)', invalidFields);
+          tf = readPositive('inp-arm-tf', 'Espesor patín tf (mm)', invalidFields);
+          tw = readPositive('inp-arm-tw', 'Espesor alma tw (mm)', invalidFields);
+          if (h > 0 && tf > 0 && h <= 2 * tf) {
+            invalidFields.push('Peralte h debe ser mayor a 2·tf');
+          }
+          hw = calcArmadaHw(h, tf);
+          dims = `${fmt(h)}x${fmt(b)}x${fmt(tf)}x${fmt(tw)} mm`;
+        }
+        const beamWeight = invalidFields.length === 0 ? calcSpecialBeamWeightKg(h, b, tf, tw, topL, webL, botL) * catalogScale : 0;
+        grossWeightKg = beamWeight * qty;
+
+        hasDestaje = document.getElementById('inp-has-destaje').checked;
+        if (hasDestaje) {
+          destLong = readPositive('inp-dest-long', 'Longitud de destaje Ld (mm)', invalidFields);
+          destAlt = readNonNegative('inp-dest-alt', 'Altura de destaje Hd (mm)', invalidFields);
+          destTipo = document.getElementById('inp-dest-tipo').value;
+          notchDeductionKg = invalidFields.length === 0 ? calcNotchDeductionKg(b, tw, tf, destLong, destTipo, qty) : 0;
+        }
+      }
+
+      const netWeightKg = invalidFields.length === 0 ? Math.max(0, grossWeightKg - notchDeductionKg) : 0;
+      if (activeTab === 5) {
+        const singlePieceNetKg = netWeightKg / qty;
+        unitWeightKgM = refLengthMm > 0 ? singlePieceNetKg / (refLengthMm / 1000.0) : 0;
+      }
+
+      return {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        category, type, name: mark,
+        h, hw, b, tf, tw, r, dims,
+        lengthMm: refLengthMm,
+        quantity: qty,
+        unitWeightKgM,
+        grossWeightKg,
+        notchDeductionKg,
+        totalWeightKg: netWeightKg,
+        totalWeightTon: netWeightKg / 1000.0,
+        hasDestaje,
+        destajeLongMm: destLong,
+        destajeAltMm: destAlt,
+        destajeTipo: destTipo,
+        topFlangeLengthMm: topL,
+        webLengthMm: webL,
+        bottomFlangeLengthMm: botL,
+        invalidFields
+      };
+    }
+
+    function updateLivePreview() {
+      const hasDest = document.getElementById('inp-has-destaje').checked;
+      document.getElementById('destaje-fields').classList.toggle('hidden', !hasDest);
+
+      const draft = computeCurrentDraft();
+      document.getElementById('preview-cat-badge').textContent = draft.category;
+      document.getElementById('prev-dims').textContent = draft.dims;
+      document.getElementById('prev-hw').textContent = draft.type === 'Placa' ? '-' : `${fmt(draft.hw)} mm`;
+      document.getElementById('prev-unit-w').textContent = draft.type === 'Placa'
+        ? `${draft.unitWeightKgM.toFixed(2)} kg/u`
+        : `${draft.unitWeightKgM.toFixed(2)} kg/m`;
+      document.getElementById('prev-gross-w').textContent = `${draft.grossWeightKg.toFixed(2)} kg`;
+      document.getElementById('prev-notch-w').textContent = `-${draft.notchDeductionKg.toFixed(2)} kg`;
+      document.getElementById('preview-destaje-deduction').textContent = `-${draft.notchDeductionKg.toFixed(2)} kg`;
+      document.getElementById('prev-net-kg').textContent = `${draft.totalWeightKg.toFixed(2)} kg`;
+      document.getElementById('prev-net-ton').textContent = `${draft.totalWeightTon.toFixed(3)} t`;
+    }
+
+    function addElementToQueue() {
+      const item = computeCurrentDraft();
+      if (item.invalidFields && item.invalidFields.length > 0) {
+        alert('Corrige las siguientes medidas antes de añadir el elemento (deben ser mayores a 0):\n- ' + item.invalidFields.join('\n- '));
+        return;
+      }
+      delete item.invalidFields;
+      beamQueue.push(item);
+      saveAndRefresh();
+    }
+
+    function deleteQueueItem(id) {
+      beamQueue = beamQueue.filter(x => x.id !== id);
+      saveAndRefresh();
+    }
+
+    function clearAllQueue() {
+      if (beamQueue.length === 0) return;
+      if (confirm('¿Deseas vaciar toda la planilla acumulada de vigas para montaje?')) {
+        beamQueue = [];
+        saveAndRefresh();
+      }
+    }
+
+    function saveCurrentProfileTemplate() {
+      const invalidList = [];
+      const h = readPositive('inp-arm-h', 'Peralte total h (mm)', invalidList);
+      const b = readPositive('inp-arm-b', 'Ancho patín b (mm)', invalidList);
+      const tf = readPositive('inp-arm-tf', 'Espesor patín tf (mm)', invalidList);
+      const tw = readPositive('inp-arm-tw', 'Espesor alma tw (mm)', invalidList);
+      const r = readNonNegative('inp-arm-r', 'Radio / soldadura r (mm)', invalidList);
+      if (h > 0 && tf > 0 && h <= 2 * tf) invalidList.push('Peralte h debe ser mayor a 2·tf');
+      if (invalidList.length > 0) {
+        alert('Corrige las medidas de la viga armada antes de guardar la plantilla:\n- ' + invalidList.join('\n- '));
+        return;
+      }
+      const name = prompt('Nombre para guardar esta plantilla de Viga Armada:', document.getElementById('inp-mark').value || 'V-ARM');
+      if (!name) return;
+      const tpl = {
+        id: Date.now(),
+        name: name.trim(),
+        h, b, tf, tw, r
+      };
+      savedTemplates.push(tpl);
+      localStorage.setItem('mj_cubicador_templates_v1', JSON.stringify(savedTemplates));
+      renderSavedTemplates();
+    }
+
+    function loadTemplate(id) {
+      const tpl = savedTemplates.find(t => t.id === id);
+      if (!tpl) return;
+      document.getElementById('inp-arm-h').value = tpl.h;
+      document.getElementById('inp-arm-b').value = tpl.b;
+      document.getElementById('inp-arm-tf').value = tpl.tf;
+      document.getElementById('inp-arm-tw').value = tpl.tw;
+      document.getElementById('inp-arm-r').value = tpl.r;
+      updateLivePreview();
+    }
+
+    function renderSavedTemplates() {
+      const bar = document.getElementById('saved-templates-bar');
+      if (savedTemplates.length === 0) {
+        bar.innerHTML = '<span class="text-[11px] font-mono text-slate-500">Sin plantillas guardadas</span>';
+        return;
+      }
+      bar.innerHTML = savedTemplates.map(t => `
+        <button type="button" onclick="loadTemplate(${t.id})" class="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-[#1e293b] text-amber-300 border border-amber-500/30 hover:border-amber-400">
+          ${escHtml(t.name)} (${t.h}x${t.b})
+        </button>
+      `).join('');
+    }
+
+    function formatDestajeLabel(item) {
+      if (!item.hasDestaje || (item.destajeLongMm <= 0 && item.destajeAltMm <= 0)) return '-';
+      const mapShort = {
+        "1 Extremo (Superior)": "1 Sup.",
+        "2 Extremos (Superior)": "2 Sup.",
+        "1 Extremo (Superior e Inferior)": "1 Sup/Inf.",
+        "2 Extremos (Superior e Inferior)": "2 Sup/Inf."
+      };
+      const short = mapShort[item.destajeTipo] || item.destajeTipo;
+      return `${Math.round(item.destajeLongMm)}x${Math.round(item.destajeAltMm)} mm (${short})`;
+    }
+
+    function saveAndRefresh() {
+      localStorage.setItem('mj_cubicador_queue_v1', JSON.stringify(beamQueue));
+      renderQueueTable();
+    }
+
+    function renderQueueTable() {
+      const filterCat = document.getElementById('filter-category').value;
+      const filtered = filterCat === 'Todos'
+        ? beamQueue
+        : beamQueue.filter(x => x.category === filterCat);
+
+      let totalPieces = 0, totalLenM = 0, totalNetKg = 0, totalDedKg = 0;
+      beamQueue.forEach(item => {
+        const isPl = item.type === 'Placa';
+        totalPieces += item.quantity;
+        if (!isPl) totalLenM += (item.lengthMm * item.quantity) / 1000.0;
+        totalNetKg += item.totalWeightKg;
+        totalDedKg += item.notchDeductionKg;
+      });
+
+      document.getElementById('sum-pieces').textContent = `${totalPieces} u`;
+      document.getElementById('sum-length').textContent = `${totalLenM.toFixed(2)} m`;
+      document.getElementById('sum-kg').textContent = `${totalNetKg.toFixed(2)} kg`;
+      document.getElementById('sum-deduction').textContent = `Destajes: -${totalDedKg.toFixed(2)} kg`;
+      document.getElementById('sum-ton').textContent = `${(totalNetKg / 1000.0).toFixed(3)} t`;
+      document.getElementById('queue-count-badge').textContent = `${beamQueue.length} ítems`;
+
+      const tbody = document.getElementById('queue-tbody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="16" class="py-10 text-center text-slate-500">
+              No hay elementos en esta categoría. Configura un perfil arriba y pulsa "+ Añadir a Lista de Montaje".
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const isPl = item.type === 'Placa';
+        const longTotM = isPl ? '-' : ((item.lengthMm * item.quantity) / 1000.0).toFixed(2);
+        const unitLabel = isPl ? `${item.unitWeightKgM.toFixed(2)} kg/u` : `${item.unitWeightKgM.toFixed(2)} kg/m`;
+        return `
+          <tr class="hover:bg-[#1e293b]/60 transition-colors">
+            <td class="py-2.5 px-3 text-slate-500">${idx + 1}</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-[#1e293b] text-[#38bdf8] border border-slate-700">${escHtml(item.category)}</span></td>
+            <td class="py-2.5 px-3 text-slate-300">${escHtml(item.type)}</td>
+            <td class="py-2.5 px-3 font-bold text-white">${escHtml(item.name)}</td>
+            <td class="py-2.5 px-3 text-slate-200">${escHtml(item.dims)}</td>
+            <td class="py-2.5 px-3 text-amber-300">${escHtml(formatDestajeLabel(item))}</td>
+            <td class="py-2.5 px-3 text-right">${isPl ? '-' : fmt(item.hw)}</td>
+            <td class="py-2.5 px-3 text-right">${Math.round(item.lengthMm)}</td>
+            <td class="py-2.5 px-3 text-right font-bold">${item.quantity}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-[#38bdf8]">${longTotM}</td>
+            <td class="py-2.5 px-3 text-right">${unitLabel}</td>
+            <td class="py-2.5 px-3 text-right">${item.grossWeightKg.toFixed(2)}</td>
+            <td class="py-2.5 px-3 text-right text-rose-400">${item.notchDeductionKg > 0 ? '-' + item.notchDeductionKg.toFixed(2) : '0.00'}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-amber-300">${item.totalWeightKg.toFixed(2)}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-[#4ade80]">${item.totalWeightTon.toFixed(3)}</td>
+            <td class="py-2.5 px-3 text-center">
+              <button type="button" onclick="deleteQueueItem(${item.id})" class="text-rose-400 hover:text-rose-300 font-bold" title="Eliminar">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportCsv(isDetailed) {
+      if (beamQueue.length === 0) { alert('La lista está vacía.'); return; }
+      let sb = 'sep=;\n';
+      if (isDetailed) {
+        sb += 'Item;Categoria;Tipo;Marca;Dimensiones;Destaje;Peralte h;Altura hw;Base b;Espesor tf;Espesor tw;Longitud;L patin superior;L alma;L patin inferior;Cantidad;Long. Total;Peso Unitario;Peso Bruto;Reduccion;Peso Neto Total;Peso Total\n';
+        sb += '-;-;-;-;-;Ld x Hd;mm;mm;mm;mm;mm;mm;mm;mm;mm;u;m;kg/m;kg;kg;kg;t\n';
+      } else {
+        sb += 'Item;Categoria;Tipo;Marca;Dimensiones;Destaje;Longitud;L patin superior;L alma;L patin inferior;Cantidad;Long. Total;Peso Unitario;Peso Bruto;Reduccion;Peso Neto Total;Peso Total\n';
+        sb += '-;-;-;-;-;Ld x Hd;mm;mm;mm;mm;u;m;kg/m;kg;kg;kg;t\n';
+      }
+
+      let sumQty = 0, sumLongM = 0, sumGross = 0, sumDed = 0, sumNet = 0;
+      beamQueue.forEach((item, idx) => {
+        const isPl = item.type === 'Placa';
+        const longM = isPl ? 0 : (item.lengthMm * item.quantity) / 1000.0;
+        sumQty += item.quantity; sumLongM += longM; sumGross += item.grossWeightKg; sumDed += item.notchDeductionKg; sumNet += item.totalWeightKg;
+        const destText = formatDestajeLabel(item);
+        const longText = isPl ? '-' : longM.toFixed(2);
+        const topStr = item.topFlangeLengthMm ? item.topFlangeLengthMm.toFixed(2) : '';
+        const webStr = item.webLengthMm ? item.webLengthMm.toFixed(2) : '';
+        const botStr = item.bottomFlangeLengthMm ? item.bottomFlangeLengthMm.toFixed(2) : '';
+
+        if (isDetailed) {
+          sb += [
+            idx + 1,
+            escCsv(item.category),
+            escCsv(item.type),
+            escCsv(item.name),
+            escCsv(item.dims),
+            escCsv(destText),
+            item.h.toFixed(1),
+            item.hw.toFixed(1),
+            item.b.toFixed(1),
+            item.tf.toFixed(1),
+            item.tw.toFixed(1),
+            item.lengthMm.toFixed(2),
+            topStr,
+            webStr,
+            botStr,
+            item.quantity,
+            longText,
+            item.unitWeightKgM.toFixed(2),
+            item.grossWeightKg.toFixed(2),
+            item.notchDeductionKg.toFixed(2),
+            item.totalWeightKg.toFixed(2),
+            item.totalWeightTon.toFixed(3)
+          ].join(';') + '\n';
+        } else {
+          sb += [
+            idx + 1,
+            escCsv(item.category),
+            escCsv(item.type),
+            escCsv(item.name),
+            escCsv(item.dims),
+            escCsv(destText),
+            item.lengthMm.toFixed(2),
+            topStr,
+            webStr,
+            botStr,
+            item.quantity,
+            longText,
+            item.unitWeightKgM.toFixed(2),
+            item.grossWeightKg.toFixed(2),
+            item.notchDeductionKg.toFixed(2),
+            item.totalWeightKg.toFixed(2),
+            item.totalWeightTon.toFixed(3)
+          ].join(';') + '\n';
+        }
+      });
+
+      const totTon = sumNet / 1000.0;
+      if (isDetailed) {
+        sb += `TOTALES;;;;;;;;;;;;;;;${sumQty};${sumLongM.toFixed(2)};;${sumGross.toFixed(2)};${sumDed.toFixed(2)};${sumNet.toFixed(2)};${totTon.toFixed(3)}\n`;
+      } else {
+        sb += `TOTALES;;;;;;;;;;${sumQty};${sumLongM.toFixed(2)};;${sumGross.toFixed(2)};${sumDed.toFixed(2)};${sumNet.toFixed(2)};${totTon.toFixed(3)}\n`;
+      }
+
+      const blob = new Blob(['\uFEFF' + sb], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = isDetailed ? 'Cubicacion_Montaje_Detallado.csv' : 'Cubicacion_Montaje_Compacto.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function exportExcelXml() {
+      if (beamQueue.length === 0) { alert('La lista está vacía.'); return; }
+      let rowsXml = '';
+      let sumQty = 0, sumLongM = 0, sumGross = 0, sumDed = 0, sumNet = 0;
+
+      beamQueue.forEach((item, idx) => {
+        const isPl = item.type === 'Placa';
+        const longM = isPl ? 0 : (item.lengthMm * item.quantity) / 1000.0;
+        sumQty += item.quantity; sumLongM += longM; sumGross += item.grossWeightKg; sumDed += item.notchDeductionKg; sumNet += item.totalWeightKg;
+        rowsXml += `
+          <Row>
+            <Cell><Data ss:Type="Number">${idx + 1}</Data></Cell>
+            <Cell><Data ss:Type="String">${escXml(item.category)}</Data></Cell>
+            <Cell><Data ss:Type="String">${escXml(item.type)}</Data></Cell>
+            <Cell><Data ss:Type="String">${escXml(item.name)}</Data></Cell>
+            <Cell><Data ss:Type="String">${escXml(item.dims)}</Data></Cell>
+            <Cell><Data ss:Type="String">${escXml(formatDestajeLabel(item))}</Data></Cell>
+            <Cell><Data ss:Type="Number">${item.lengthMm.toFixed(1)}</Data></Cell>
+            <Cell><Data ss:Type="Number">${item.quantity}</Data></Cell>
+            <Cell><Data ss:Type="Number">${longM.toFixed(2)}</Data></Cell>
+            <Cell><Data ss:Type="Number">${item.unitWeightKgM.toFixed(2)}</Data></Cell>
+            <Cell><Data ss:Type="Number">${item.grossWeightKg.toFixed(2)}</Data></Cell>
+            <Cell><Data ss:Type="Number">${item.notchDeductionKg.toFixed(2)}</Data></Cell>
+            <Cell><Data ss:Type="Number">${item.totalWeightKg.toFixed(2)}</Data></Cell>
+            <Cell><Data ss:Type="Number">${item.totalWeightTon.toFixed(3)}</Data></Cell>
+          </Row>`;
+      });
+
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Worksheet ss:Name="Cubicacion Montaje">
+  <Table>
+   <Row>
+    <Cell><Data ss:Type="String">Item</Data></Cell>
+    <Cell><Data ss:Type="String">Categoria</Data></Cell>
+    <Cell><Data ss:Type="String">Tipo</Data></Cell>
+    <Cell><Data ss:Type="String">Marca</Data></Cell>
+    <Cell><Data ss:Type="String">Dimensiones</Data></Cell>
+    <Cell><Data ss:Type="String">Destaje</Data></Cell>
+    <Cell><Data ss:Type="String">Longitud (mm)</Data></Cell>
+    <Cell><Data ss:Type="String">Cantidad (u)</Data></Cell>
+    <Cell><Data ss:Type="String">Long. Total (m)</Data></Cell>
+    <Cell><Data ss:Type="String">Peso Unit. (kg/m)</Data></Cell>
+    <Cell><Data ss:Type="String">Peso Bruto (kg)</Data></Cell>
+    <Cell><Data ss:Type="String">Reduccion (kg)</Data></Cell>
+    <Cell><Data ss:Type="String">Peso Neto (kg)</Data></Cell>
+    <Cell><Data ss:Type="String">Total (t)</Data></Cell>
+   </Row>
+   ${rowsXml}
+   <Row>
+    <Cell><Data ss:Type="String">TOTALES</Data></Cell>
+    <Cell/><Cell/><Cell/><Cell/><Cell/><Cell/>
+    <Cell><Data ss:Type="Number">${sumQty}</Data></Cell>
+    <Cell><Data ss:Type="Number">${sumLongM.toFixed(2)}</Data></Cell>
+    <Cell/>
+    <Cell><Data ss:Type="Number">${sumGross.toFixed(2)}</Data></Cell>
+    <Cell><Data ss:Type="Number">${sumDed.toFixed(2)}</Data></Cell>
+    <Cell><Data ss:Type="Number">${sumNet.toFixed(2)}</Data></Cell>
+    <Cell><Data ss:Type="Number">${(sumNet / 1000.0).toFixed(3)}</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+      const blob = new Blob(['\uFEFF' + xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Cubicacion_Montaje_MJStruct.xls';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function printPdfReport() {
+      if (beamQueue.length === 0) { alert('La lista está vacía.'); return; }
+      let totalPzas = 0, totalM = 0, totalGrossKg = 0, totalDedKg = 0, totalNetKg = 0;
+      let rowsHtml = '';
+      const catGroups = {};
+
+      beamQueue.forEach((v, i) => {
+        const isPl = v.type === 'Placa';
+        const longM = isPl ? 0 : (v.lengthMm * v.quantity) / 1000.0;
+        totalPzas += v.quantity; totalM += longM; totalGrossKg += v.grossWeightKg; totalDedKg += v.notchDeductionKg; totalNetKg += v.totalWeightKg;
+
+        if (!catGroups[v.category]) catGroups[v.category] = { pzas: 0, kg: 0 };
+        catGroups[v.category].pzas += v.quantity;
+        catGroups[v.category].kg += v.totalWeightKg;
+
+        rowsHtml += `
+          <tr>
+            <td>${i + 1}</td>
+            <td><b>${escHtml(v.category)}</b></td>
+            <td>${escHtml(v.type)}</td>
+            <td><b>${escHtml(v.name)}</b></td>
+            <td>${escHtml(v.dims)}</td>
+            <td>${escHtml(formatDestajeLabel(v))}</td>
+            <td>${isPl ? '-' : fmt(v.hw)}</td>
+            <td>${Math.round(v.lengthMm)}</td>
+            <td>${v.quantity}</td>
+            <td><b>${isPl ? '-' : longM.toFixed(2)}</b></td>
+            <td>${v.unitWeightKgM.toFixed(2)}</td>
+            <td>${v.grossWeightKg.toFixed(2)}</td>
+            <td>${v.notchDeductionKg > 0 ? '-' + v.notchDeductionKg.toFixed(2) : '0.00'}</td>
+            <td><b>${v.totalWeightKg.toFixed(2)}</b></td>
+            <td style="color:#047857;font-weight:bold;">${v.totalWeightTon.toFixed(3)}</td>
+          </tr>`;
+      });
+
+      let catHtml = '';
+      Object.keys(catGroups).forEach(cat => {
+        const g = catGroups[cat];
+        catHtml += `
+          <tr>
+            <td style="text-align:left;padding-left:8px;"><b>${escHtml(cat)}</b></td>
+            <td>${g.pzas} u</td>
+            <td><b>${g.kg.toFixed(1)} kg</b></td>
+            <td style="color:#047857;font-weight:bold;">${(g.kg / 1000.0).toFixed(3)} t</td>
+          </tr>`;
+      });
+
+      const win = window.open('', '_blank');
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Reporte de Cubicación MJ Struct</title>
+        <style>
+          @page { size: landscape; margin: 8mm; }
+          body { font-family: Arial, sans-serif; font-size: 9pt; color: #000; }
+          h2 { text-align: center; margin-bottom: 2px; text-transform: uppercase; }
+          p { text-align: center; font-size: 8pt; color: #555; margin-top: 0; }
+          table { width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 14px; }
+          th, td { border: 1px solid #333; padding: 4px 3px; font-size: 8pt; }
+          th { background: #e2e8f0; }
+          .tot { background: #cbd5e1; font-weight: bold; }
+        </style></head><body>
+        <h2>MJ STRUCT · Control y Cubicador de Estructuras de Acero para Montaje</h2>
+        <p>V. Principales, V. Secundarias (Destajes), Columnas, Correas, Placas y Vigas Especiales</p>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Categoría</th><th>Tipo</th><th>Marca</th><th>Dimensiones</th><th>Destaje</th><th>hw (mm)</th><th>L (mm)</th><th>Cant</th><th>L. Total (m)</th><th>Peso Unit.</th><th>Bruto (kg)</th><th>Reducción</th><th>Neto (kg)</th><th>Total (t)</th></tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+            <tr class="tot">
+              <td colspan="8">TOTALES ACUMULADOS</td>
+              <td>${totalPzas}</td>
+              <td>${totalM.toFixed(2)}</td>
+              <td>-</td>
+              <td>${totalGrossKg.toFixed(2)}</td>
+              <td>${totalDedKg.toFixed(2)}</td>
+              <td>${totalNetKg.toFixed(2)}</td>
+              <td style="color:#047857;">${(totalNetKg / 1000.0).toFixed(3)}</td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width:440px;">
+          <thead><tr><th colspan="4">RESUMEN DE TONELAJE POR CATEGORÍA</th></tr><tr><th>Categoría</th><th>Piezas</th><th>Peso Neto</th><th>Total (t)</th></tr></thead>
+          <tbody>${catHtml}<tr class="tot"><td>TOTAL GENERAL</td><td>${totalPzas} u</td><td>${totalNetKg.toFixed(1)} kg</td><td style="color:#047857;">${(totalNetKg / 1000.0).toFixed(3)} t</td></tr></tbody>
+        </table>
+        <script>window.onload = () => { window.print(); };<\/script>
+      </body></html>`);
+      win.document.close();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      filterCommercialSeries();
+      initColdFormedPresets();
+      renderSavedTemplates();
+      selectTab(0);
+      renderQueueTable();
+    });
+  </script>
+</body>
+</html>

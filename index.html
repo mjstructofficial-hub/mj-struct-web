@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MJ Struct | Ingeniería Estructural, Software Técnico y Automatización</title>
+  <meta name="description" content="MJ Struct: Georreferenciación y Espectros Sísmicos NEC-15 (MapaPro), Simulador Pro Complexivo de Ingeniería Civil, Cubicador de Vigas de Acero, Automatización ETABS y Python." />
+  <link rel="icon" type="image/webp" href="./assets/img/Mjstruct.webp" />
+  <link rel="apple-touch-icon" href="./assets/img/Mjstruct.png" />
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mj: {
+              bg: '#0f172a',
+              deep: '#070c18',
+              card: '#1e293b',
+              cobalt: '#0c4dbe',
+              royal: '#2563eb',
+              accent: '#38bdf8',
+              neon: '#00d2ff',
+              emerald: '#10b981',
+              amber: '#f59e0b',
+              indigo: '#6366f1',
+              silver: '#e2e8f0'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 28px -5px rgba(56, 189, 248, 0.35)',
+            'glow-cobalt': '0 0 32px -6px rgba(37, 99, 235, 0.45)',
+            'glow-emerald': '0 0 28px -5px rgba(16, 185, 129, 0.35)',
+            'glow-amber': '0 0 28px -5px rgba(245, 158, 11, 0.35)',
+            'glow-indigo': '0 0 28px -5px rgba(99, 102, 241, 0.35)'
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .bg-mj-grid {
+      background-size: 42px 42px;
+      background-image: 
+        linear-gradient(to right, rgba(56, 189, 248, 0.055) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(37, 99, 235, 0.055) 1px, transparent 1px);
+    }
+
+    .bg-hero-aura {
+      background:
+        radial-gradient(circle at 18% 15%, rgba(12, 77, 190, 0.28) 0%, transparent 45%),
+        radial-gradient(circle at 82% 20%, rgba(56, 189, 248, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.10) 0%, transparent 50%);
+    }
+
+    .tech-card {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+      border: 1px solid rgba(51, 65, 85, 0.85);
+      transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tech-card-cyan:hover {
+      border-color: #38bdf8;
+      transform: translateY(-5px);
+      box-shadow: 0 14px 34px -10px rgba(56, 189, 248, 0.32);
+    }
+    .tech-card-emerald:hover {
+      border-color: #10b981;
+      transform: translateY(-5px);
+      box-shadow: 0 14px 34px -10px rgba(16, 185, 129, 0.32);
+    }
+    .tech-card-amber:hover {
+      border-color: #f59e0b;
+      transform: translateY(-5px);
+      box-shadow: 0 14px 34px -10px rgba(245, 158, 11, 0.32);
+    }
+    .tech-card-indigo:hover {
+      border-color: #818cf8;
+      transform: translateY(-5px);
+      box-shadow: 0 14px 34px -10px rgba(99, 102, 241, 0.32);
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #070c18; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; border: 1px solid #334155; }
+    ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+  </style>
+</head>
+<body class="bg-[#0f172a] text-slate-100 antialiased selection:bg-[#38bdf8] selection:text-[#0f172a]">
+
+  <!-- ==================== BARRA DE NAVEGACIÓN FIJA ==================== -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[#070c18]/90 backdrop-blur-md border-b border-slate-800/90">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logotipo y Marca -->
+        <a href="#inicio" class="flex items-center gap-3.5 group focus:outline-none">
+          <div class="relative w-11 h-11 rounded-xl overflow-hidden border-2 border-[#38bdf8]/60 shadow-glow-cyan group-hover:border-[#00d2ff] transition-all bg-[#0c4dbe] flex items-center justify-center">
+            <picture>
+              <source srcset="./assets/img/Mjstruct.webp" type="image/webp" />
+              <img src="./assets/img/Mjstruct.png" alt="Logo MJ Struct" class="w-full h-full object-cover" />
+            </picture>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-extrabold tracking-tight text-white group-hover:text-[#38bdf8] transition-colors">
+                MJ <span class="text-[#38bdf8]">STRUCT</span>
+              </span>
+              <span class="hidden sm:inline-block text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-gradient-to-r from-[#0c4dbe] to-[#2563eb] text-white border border-[#38bdf8]/40">
+                INGENIERÍA &amp; DEV
+              </span>
+            </div>
+            <span class="text-xs text-slate-300 font-mono">Estructuras · Sísmica · Python · Apps</span>
+          </div>
+        </a>
+
+        <!-- Enlaces Rápidos Desktop -->
+        <nav class="hidden md:flex items-center gap-1 lg:gap-2">
+          <a href="#inicio" class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:text-[#38bdf8] hover:bg-[#1e293b]/70 transition-all">
+            Inicio
+          </a>
+          <a href="#herramientas" class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:text-[#38bdf8] hover:bg-[#1e293b]/70 transition-all flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Proyectos &amp; Apps
+          </a>
+          <a href="#recursos" class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:text-[#38bdf8] hover:bg-[#1e293b]/70 transition-all">
+            Descargas Excel
+          </a>
+          <a href="#contacto" class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:text-[#38bdf8] hover:bg-[#1e293b]/70 transition-all">
+            Cotizaciones
+          </a>
+        </nav>
+
+        <!-- Accesos Rápidos -->
+        <div class="hidden md:flex items-center gap-2.5">
+          <a href="./MapaPro-MJ%20Struct/index.html" class="px-3.5 py-2.5 rounded-xl text-xs font-mono font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-400/40 hover:bg-emerald-500/25 transition-all flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            MapaPro NEC-15
+          </a>
+          <a href="./Cubicar%20de%20vigas/index.html" class="px-4 py-2.5 rounded-xl text-xs font-mono font-bold text-[#070c18] bg-gradient-to-r from-[#38bdf8] to-cyan-300 hover:from-sky-300 hover:to-white shadow-glow-cyan transition-all flex items-center gap-1.5">
+            <span>Cubicador de Vigas</span>
+            <span>→</span>
+          </a>
+        </div>
+
+        <!-- Botón Menú Móvil -->
+        <button id="mobile-menu-btn" type="button" aria-label="Abrir menú" class="md:hidden p-2.5 rounded-xl bg-[#1e293b] border border-slate-700 text-slate-200 hover:text-[#38bdf8] hover:border-[#38bdf8] focus:outline-none">
+          <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Menú Móvil -->
+    <div id="mobile-menu" class="hidden md:hidden bg-[#131b2e] border-b border-slate-700/90 px-4 pt-3 pb-5 space-y-2">
+      <a href="#inicio" class="mobile-nav-link block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-[#0f172a] hover:text-[#38bdf8]">Inicio</a>
+      <a href="#herramientas" class="mobile-nav-link block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-[#0f172a] hover:text-[#38bdf8]">Proyectos y Herramientas</a>
+      <a href="#recursos" class="mobile-nav-link block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-[#0f172a] hover:text-[#38bdf8]">Hojas de Cálculo (Importador ETABS)</a>
+      <a href="#contacto" class="mobile-nav-link block px-4 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-[#0f172a] hover:text-[#38bdf8]">Contacto y Cotizaciones</a>
+      <div class="pt-3 border-t border-slate-700/80 grid grid-cols-1 gap-2">
+        <a href="./MapaPro-MJ%20Struct/index.html" class="w-full py-2.5 rounded-xl text-center text-xs font-mono font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-400/40">
+          Abrir MapaPro · Espectro Sísmico NEC-15
+        </a>
+        <a href="./Cubicar%20de%20vigas/index.html" class="w-full py-2.5 rounded-xl text-center text-xs font-mono font-bold text-[#070c18] bg-[#38bdf8]">
+          Abrir Cubicador de Vigas →
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== SECCIÓN HERO ==================== -->
+  <section id="inicio" class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 bg-mj-grid bg-hero-aura overflow-hidden border-b border-slate-800">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+        
+        <!-- Columna Izquierda: Propuesta de Valor y Redes -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <div class="inline-flex flex-wrap items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#131b2e] border border-[#38bdf8]/40 text-xs font-mono text-[#38bdf8] shadow-glow-cyan">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="font-semibold text-white">MJ STRUCT</span>
+            <span class="text-slate-500">|</span>
+            <span>INGENIERÍA ESTRUCTURAL &amp; DESARROLLO TÉCNICO</span>
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
+            Ingeniería Estructural, <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] via-cyan-300 to-emerald-300">Automatización</span> y Software Aplicado
+          </h1>
+
+          <p class="text-base sm:text-lg text-slate-200 leading-relaxed max-w-2xl">
+            Desarrollamos herramientas reales para ingeniería civil y estructural: georreferenciación y <strong class="text-emerald-300 font-semibold">espectros sísmicos NEC-15</strong>, <strong class="text-[#38bdf8] font-semibold">entrenamiento para el examen complexivo</strong>, <strong class="text-amber-300 font-semibold">cubicación y montaje de vigas de acero</strong>, e importadores automatizados hacia <strong class="text-indigo-300 font-semibold">CSI ETABS</strong>.
+          </p>
+
+          <!-- Botones de Acción Principal -->
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <a href="./MapaPro-MJ%20Struct/index.html" class="px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-400 to-teal-300 text-[#070c18] hover:from-emerald-300 hover:to-white shadow-glow-emerald transition-all flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span>Geo-Sísmica &amp; Espectro NEC-15</span>
+            </a>
+            <a href="./Cubicar%20de%20vigas/index.html" class="px-6 py-3.5 rounded-xl font-bold text-sm bg-[#1e293b] text-amber-300 border border-amber-500/40 hover:border-amber-400 hover:bg-amber-500/15 transition-all flex items-center gap-2">
+              <span>Cubicador de Vigas →</span>
+            </a>
+            <a href="#contacto" class="px-5 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-[#0c4dbe] to-[#2563eb] text-white border border-[#38bdf8]/50 hover:border-white shadow-glow-cobalt transition-all flex items-center gap-2">
+              <span>Solicitar Cotización / Consulta</span>
+            </a>
+          </div>
+
+          <!-- Canales Oficiales de MJ Struct -->
+          <div class="pt-5 border-t border-slate-800">
+            <p class="text-xs font-mono uppercase tracking-wider text-slate-300 mb-3">
+              Canales Oficiales de Contenido y Tutoriales de MJ Struct:
+            </p>
+            <div class="flex flex-wrap items-center gap-3">
+              <!-- YouTube -->
+              <a href="https://www.youtube.com/@MJStruct" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#1e293b] border border-red-500/30 hover:border-red-500 hover:bg-red-500/15 transition-all">
+                <svg class="w-5 h-5 text-red-500 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                <div class="text-left">
+                  <span class="block text-xs font-bold text-white group-hover:text-red-300">YouTube</span>
+                  <span class="block text-[10px] font-mono text-slate-300">MJ Struct</span>
+                </div>
+              </a>
+
+              <!-- TikTok -->
+              <a href="https://www.tiktok.com/@mjstruct" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#1e293b] border border-[#38bdf8]/30 hover:border-[#38bdf8] hover:bg-[#38bdf8]/15 transition-all">
+                <svg class="w-5 h-5 text-[#38bdf8] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+                <div class="text-left">
+                  <span class="block text-xs font-bold text-white group-hover:text-[#38bdf8]">TikTok</span>
+                  <span class="block text-[10px] font-mono text-slate-300">@mjstruct</span>
+                </div>
+              </a>
+
+              <!-- Facebook -->
+              <a href="https://www.facebook.com/MJStruct" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#1e293b] border border-blue-500/30 hover:border-blue-400 hover:bg-blue-500/15 transition-all">
+                <svg class="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+                </svg>
+                <div class="text-left">
+                  <span class="block text-xs font-bold text-white group-hover:text-blue-300">Facebook</span>
+                  <span class="block text-[10px] font-mono text-slate-300">MJ Struct Oficial</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Columna Derecha: Panel de Ecosistema Activo MJ Struct -->
+        <div class="lg:col-span-5">
+          <div class="relative rounded-2xl bg-[#131b2e] border-2 border-[#38bdf8]/40 shadow-glow-cobalt overflow-hidden">
+            
+            <div class="flex items-center justify-between px-4 py-3 bg-[#070c18] border-b border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                <span class="ml-2 text-xs font-mono text-slate-300">ecosistema_mj_struct.py</span>
+              </div>
+              <span class="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded bg-[#0c4dbe] text-white border border-[#38bdf8]/40">
+                5 Proyectos Activos
+              </span>
+            </div>
+
+            <div class="p-5 space-y-4">
+              <div class="flex items-center gap-4 p-3.5 rounded-xl bg-gradient-to-r from-[#0c4dbe]/40 via-[#0f172a] to-[#0f172a] border border-[#38bdf8]/30">
+                <img src="./assets/img/Mjstruct.webp" alt="MJ Struct" class="w-14 h-14 rounded-xl object-cover border-2 border-[#38bdf8]" />
+                <div>
+                  <div class="text-xs font-mono font-bold text-[#38bdf8] uppercase tracking-wider">Suite Oficial de Ingeniería</div>
+                  <div class="text-base font-extrabold text-white">MJ Struct · Portafolio Técnico</div>
+                  <div class="text-xs text-slate-300">NEC-SE-DS 2015 · Acero AISC · Hormigón ACI · CSI API</div>
+                </div>
+              </div>
+
+              <div class="space-y-2.5 font-mono text-xs">
+                <a href="./MapaPro-MJ%20Struct/index.html" class="flex items-center justify-between p-3 rounded-xl bg-[#0a0f1d] border border-emerald-500/40 hover:border-emerald-400 transition-all">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    <span class="text-white font-bold">1. MapaPro · Geo-Sísmica NEC-15</span>
+                  </div>
+                  <span class="text-emerald-300 font-semibold">Abrir App →</span>
+                </a>
+
+                <a href="#contacto" onclick="prefillQuote('Consulta sobre Simulador Complexivo (Uso Académico)')" class="flex items-center justify-between p-3 rounded-xl bg-[#0a0f1d] border border-[#38bdf8]/40 hover:border-[#38bdf8] transition-all">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#38bdf8]"></span>
+                    <span class="text-white font-bold">2. Simulador Complexivo (Académico)</span>
+                  </div>
+                  <span class="text-[#38bdf8] font-semibold">Consultar →</span>
+                </a>
+
+                <a href="./Cubicar%20de%20vigas/index.html" class="flex items-center justify-between p-3 rounded-xl bg-[#0a0f1d] border border-amber-500/40 hover:border-amber-400 transition-all">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                    <span class="text-white font-bold">3. Cubicador de Vigas &amp; Montaje</span>
+                  </div>
+                  <span class="text-amber-300 font-semibold">Web + APK →</span>
+                </a>
+
+                <a href="./Transcriptor%20de%20Audio/index.html" class="flex items-center justify-between p-3 rounded-xl bg-[#0a0f1d] border border-indigo-500/40 hover:border-indigo-400 transition-all">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+                    <span class="text-white font-bold">4. Transcriptor Local Video a Texto</span>
+                  </div>
+                  <span class="text-indigo-300 font-semibold">Python IA →</span>
+                </a>
+
+                <a href="./descargas/Importador.xlsm" download="Importador.xlsm" class="flex items-center justify-between p-3 rounded-xl bg-[#0a0f1d] border border-teal-500/40 hover:border-teal-400 transition-all">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-teal-400"></span>
+                    <span class="text-white font-bold">5. Importador Excel → ETABS</span>
+                  </div>
+                  <span class="text-teal-300 font-semibold">Descargar ↓</span>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECCIÓN: HERRAMIENTAS WEB Y PROYECTOS ACTIVOS ==================== -->
+  <section id="herramientas" class="py-20 lg:py-24 bg-[#0f172a] relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#38bdf8] mb-2">
+            <span>// 01. ECOSISTEMA DE SOFTWARE MJ STRUCT</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Herramientas Web y <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] to-emerald-300">Aplicaciones Activas</span>
+          </h2>
+          <p class="mt-2 text-slate-300 max-w-2xl text-sm sm:text-base">
+            Accede directamente a las herramientas desarrolladas por <strong class="text-white">MJ Struct</strong> que integran cartografía sísmica, evaluación académica, cubicación de acero en obra y procesamiento local en Python.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-mono text-white bg-[#131b2e] px-4 py-2.5 rounded-xl border border-[#38bdf8]/40">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>4 Aplicaciones Integradas</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- 1. MAPAPRO-MJ STRUCT: GEO-SÍSMICA ECUADOR NEC-15 -->
+        <article class="tech-card tech-card-emerald rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute -top-10 -right-10 w-44 h-44 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                INTEGRADO EN WEB · NEC-SE-DS 2015
+              </span>
+              <span class="text-xs font-mono font-semibold text-emerald-300">/MapaPro-MJ Struct</span>
+            </div>
+
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-13 h-13 p-3 rounded-xl bg-emerald-500/15 border border-emerald-400/50 flex items-center justify-center text-emerald-300 group-hover:bg-emerald-400 group-hover:text-[#070c18] transition-all">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-white group-hover:text-emerald-300 transition-colors">
+                  Geo-Sísmica Ecuador NEC-15 (MapaPro)
+                </h3>
+                <p class="text-xs font-mono text-emerald-300">Georreferenciación de Proyectos y Espectros de Aceleración</p>
+              </div>
+            </div>
+
+            <p class="text-sm text-slate-200 leading-relaxed mb-5">
+              Plataforma cartográfica e ingenieril que ubica el proyecto por <strong class="text-white">Provincia, Cantón, Parroquia, coordenadas GPS o enlace de Google Maps</strong>. Determina automáticamente la zona sísmica ($Z$), región espectral ($\eta$), factores de sitio ($F_a, F_d, F_s$), período fundamental aproximado ($T_a$), cortante basal ($V = C_s \cdot W$) y grafica los <strong class="text-emerald-300">espectros horizontales elásticos e inelásticos NEC-15</strong> con ficha técnica exportable.
+            </p>
+
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-emerald-300 border border-emerald-500/30">24 Provincias &amp; Parroquias DPA</span>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-slate-200 border border-slate-700">Espectro Elástico &amp; Diseño</span>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-slate-200 border border-slate-700">Mapas Leaflet + Ficha Técnica</span>
+            </div>
+          </div>
+
+          <a href="./MapaPro-MJ%20Struct/index.html" class="w-full py-3.5 px-5 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-400 to-teal-300 text-[#070c18] hover:from-emerald-300 hover:to-white shadow-glow-emerald transition-all flex items-center justify-center gap-2">
+            <span>Abrir Geo-Sísmica Ecuador NEC-15</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </article>
+
+        <!-- 2. SIMULADOR COMPLEXIVO - MJ STRUCT (SOLO TARJETA DE CONSULTA) -->
+        <article class="tech-card tech-card-cyan rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute -top-10 -right-10 w-44 h-44 bg-[#38bdf8]/15 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40">
+                <span class="w-2 h-2 rounded-full bg-[#38bdf8] animate-pulse"></span>
+                ENTRENAMIENTO ACADÉMICO · ACCESO POR CONSULTA
+              </span>
+              <span class="text-xs font-mono font-semibold text-[#38bdf8]">Uso Interno / Académico</span>
+            </div>
+
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-13 h-13 p-3 rounded-xl bg-[#0c4dbe]/40 border border-[#38bdf8]/50 flex items-center justify-center text-[#38bdf8] group-hover:bg-[#38bdf8] group-hover:text-[#070c18] transition-all">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-white group-hover:text-[#38bdf8] transition-colors">
+                  Simulador - Examen Complexivo
+                </h3>
+                <p class="text-xs font-mono text-[#38bdf8]">Entrenamiento de Ingeniería Civil · 7 Áreas Técnicas</p>
+              </div>
+            </div>
+
+            <p class="text-sm text-slate-200 leading-relaxed mb-5">
+              Herramienta interactiva de estudio para preparación del examen complexivo de Ingeniería Civil. Incluye modos de <strong class="text-white">estudio libre, práctica por materia y simulacros cronometrados de 60 preguntas</strong> en <span class="text-[#38bdf8] font-medium">Estructuras, Hormigón Armado, Suelos, Hidráulica, Carreteras, Topografía y Ambiental</span>, con fórmulas matemáticas y resolución paso a paso.
+            </p>
+
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-[#38bdf8] border border-[#38bdf8]/30">7 Materias de Ing. Civil</span>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-slate-200 border border-slate-700">Simulacros 60 Reactivos</span>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-slate-200 border border-slate-700">Consulta Privada</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="#contacto" onclick="prefillQuote('Consulta sobre Simulador Complexivo (Uso Académico)')" class="w-full py-3.5 px-5 rounded-xl font-bold text-sm bg-gradient-to-r from-[#38bdf8] to-cyan-300 text-[#070c18] hover:from-sky-300 hover:to-white shadow-glow-cyan transition-all flex items-center justify-center gap-2">
+              <span>Consultar Información sobre el Simulador</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- 3. CUBICAR DE VIGAS / CUBICADOR DE MONTAJE -->
+        <article class="tech-card tech-card-amber rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute -top-10 -right-10 w-44 h-44 bg-amber-500/15 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                ACERO ESTRUCTURAL · TRANSPORTE &amp; MONTAJE
+              </span>
+              <span class="text-xs font-mono font-semibold text-amber-300">/Cubicar de vigas</span>
+            </div>
+
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-13 h-13 p-3 rounded-xl bg-amber-500/15 border border-amber-400/50 flex items-center justify-center text-amber-300 group-hover:bg-amber-400 group-hover:text-[#070c18] transition-all">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-white group-hover:text-amber-300 transition-colors">
+                  Cubicador de Vigas y Montaje en Obra
+                </h3>
+                <p class="text-xs font-mono text-amber-300">Perfiles Comerciales, Vigas Armadas y Destajes</p>
+              </div>
+            </div>
+
+            <p class="text-sm text-slate-200 leading-relaxed mb-5">
+              Sistema especializado para control y cubicación de acero estructural ($\rho = 7850\text{ kg/m}^3$) para transporte y montaje en obra. Incluye catálogo de perfiles <strong class="text-white">IPE (80-600), HEA, HEB, IPN, W y tubulares HSS (ASTM A500)</strong>, cálculo de <strong class="text-amber-300">vigas armadas soldadas, columnas cajón (2 canales U), correas G/U</strong>, descuento exacto de peso por destajes en patines y exportación a Excel, CSV y PDF.
+            </p>
+
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-amber-300 border border-amber-500/30">IPE · HEA · HEB · W · HSS</span>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-slate-200 border border-slate-700">Vigas Armadas &amp; Destajes</span>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-slate-200 border border-slate-700">Web + App Android Sync</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="./Cubicar%20de%20vigas/index.html" class="flex-1 py-3.5 px-5 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-400 to-yellow-300 text-[#070c18] hover:from-amber-300 hover:to-white shadow-glow-amber transition-all flex items-center justify-center gap-2">
+              <span>Abrir Cubicador de Vigas (Web Sync APK)</span>
+              <span>→</span>
+            </a>
+            <button type="button" onclick="openProjectModal('cubicador')" class="py-3.5 px-4 rounded-xl font-mono font-bold text-xs bg-amber-500/15 text-amber-300 border border-amber-400/40 hover:bg-amber-500/25 transition-all flex items-center justify-center">
+              Ficha APK
+            </button>
+          </div>
+        </article>
+
+        <!-- 4. TRANSCRIPTOR DE AUDIO LOCAL CON IA -->
+        <article class="tech-card tech-card-indigo rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute -top-10 -right-10 w-44 h-44 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/40">
+                <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                AUTOMATIZACIÓN PYTHON · FASTER-WHISPER IA
+              </span>
+              <span class="text-xs font-mono font-semibold text-indigo-300">/Transcriptor de Audio</span>
+            </div>
+
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-13 h-13 p-3 rounded-xl bg-indigo-500/15 border border-indigo-400/50 flex items-center justify-center text-indigo-300 group-hover:bg-indigo-400 group-hover:text-[#070c18] transition-all">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-white group-hover:text-indigo-300 transition-colors">
+                  Transcriptor Local Video a Texto
+                </h3>
+                <p class="text-xs font-mono text-indigo-300">Procesamiento en Memoria RAM con Python + FastAPI</p>
+              </div>
+            </div>
+
+            <p class="text-sm text-slate-200 leading-relaxed mb-5">
+              Herramienta de automatización en Python que transcribe videos públicos de <strong class="text-white">YouTube, TikTok, Instagram Reels y Facebook</strong> a texto. Conecta <span class="font-mono text-xs text-indigo-300">yt-dlp</span> con <span class="font-mono text-xs text-indigo-300">ffmpeg</span> mediante tuberías en memoria RAM (hasta 100 minutos PCM sin escribir archivos temporales al disco) y ejecuta reconocimiento de voz neuronal con <strong class="text-indigo-300">Faster-Whisper (int8 CPU)</strong>.
+            </p>
+
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-indigo-300 border border-indigo-500/30">Faster-Whisper int8</span>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-slate-200 border border-slate-700">RAM Pipe (Sin Disco)</span>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#070c18] text-slate-200 border border-slate-700">FastAPI + UI Web</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="./Transcriptor%20de%20Audio/index.html" class="flex-1 py-3.5 px-5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-400 to-violet-300 text-[#070c18] hover:from-indigo-300 hover:to-white shadow-glow-indigo transition-all flex items-center justify-center gap-2">
+              <span>Interfaz Transcriptor (Servidor Local)</span>
+              <span>→</span>
+            </a>
+            <button type="button" onclick="openProjectModal('transcriptor')" class="py-3.5 px-4 rounded-xl font-mono font-bold text-xs bg-indigo-500/15 text-indigo-300 border border-indigo-400/40 hover:bg-indigo-500/25 transition-all flex items-center justify-center">
+              Arquitectura Python
+            </button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECCIÓN: HOJAS DE CÁLCULO Y RECURSOS (CARPETA DESCARGAS) ==================== -->
+  <section id="recursos" class="py-20 lg:py-24 bg-[#0a0f1d] border-t border-slate-800 bg-mj-grid">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-emerald-400 mb-2">
+            <span>// 02. CARPETA DE DESCARGAS · AUTOMATIZACIÓN CSI ETABS</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Hojas de Cálculo y <span class="text-emerald-400">Macros de Ingeniería</span>
+          </h2>
+          <p class="mt-2 text-slate-300 max-w-2xl text-sm sm:text-base">
+            Descarga directa de la plantilla oficial alojada en la carpeta <code class="text-emerald-300 font-mono">/descargas</code>, programada con macros VBA para conexión directa con ETABS.
+          </p>
+        </div>
+      </div>
+
+      <article class="tech-card tech-card-emerald rounded-2xl p-6 sm:p-8 border-2 border-emerald-500/50 relative overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <div class="lg:col-span-8 space-y-4">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-400 text-[#070c18]">
+                DESCARGA DIRECTA · /descargas/Importador.xlsm
+              </span>
+              <span class="px-3 py-1 rounded-full text-xs font-mono bg-[#0c4dbe]/40 text-[#38bdf8] border border-[#38bdf8]/40">
+                Excel Macro-Enabled (.xlsm) · 309 KB
+              </span>
+              <span class="px-3 py-1 rounded-full text-xs font-mono bg-[#070c18] text-slate-200 border border-slate-700">
+                7 Hojas Programadas + API CSI ETABS
+              </span>
+            </div>
+
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
+              Importador de Datos desde Excel hacia ETABS (<span class="text-emerald-400 font-mono">Importador.xlsm</span>)
+            </h3>
+
+            <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+              Plantilla automatizada mediante macros VBA (<span class="font-mono text-xs text-emerald-300">vbaProject.bin</span>) conectada a la API de CSI ETABS para crear y configurar íntegramente modelos de <strong class="text-white">Hormigón Armado, Acero Estructural y Mampostería</strong> desde Excel.
+            </p>
+
+            <div class="pt-2">
+              <h4 class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-300 mb-3">
+                Las 7 hojas técnicas que calcula y exporta la plantilla:
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
+                  <span class="font-mono font-bold text-emerald-400">01.</span>
+                  <div>
+                    <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Grillas</span></strong>
+                    <span class="text-slate-300">Creación de niveles (Story ID, alturas, elevaciones) y grillas en X e Y por coordenadas o espaciamiento.</span>
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
+                  <span class="font-mono font-bold text-emerald-400">02.</span>
+                  <div>
+                    <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Materiales</span></strong>
+                    <span class="text-slate-300">Hormigón ($f'_c = 140$ a $500\text{ kg/cm}^2$), Acero de refuerzo ASTM A615/A706, Acero estructural A36/A572/A992/HSS A500 y Mampostería.</span>
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
+                  <span class="font-mono font-bold text-emerald-400">03.</span>
+                  <div>
+                    <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Secciones</span> (Frame)</strong>
+                    <span class="text-slate-300">Vigas principales, secundarias, de borde y columnas en H.A. y Acero (Perfiles I y Tubos HSS), área teórica, inercia $I_{33}$ y modificadores.</span>
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
+                  <span class="font-mono font-bold text-emerald-400">04.</span>
+                  <div>
+                    <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Secciones_Area</span></strong>
+                    <span class="text-slate-300">Propiedades de losas (Shell-Thin/Thick, macizas y nervadas) y muros (`Wall`) con modificadores de rigidez ($f_{11}, f_{22}, m_{11}, m_{22}$).</span>
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
+                  <span class="font-mono font-bold text-emerald-400">05.</span>
+                  <div>
+                    <strong class="text-white block">Hoja <span class="font-mono text-emerald-300">Cargas_Combinaciones</span></strong>
+                    <span class="text-slate-300">Parámetros sísmicos ($C, K$, excentricidad, fuente de masa / peso reactivo), patrones Dead/Live/Sx/Sy y combinaciones LRFD + Envolvente.</span>
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-800 flex items-start gap-2.5">
+                  <span class="font-mono font-bold text-emerald-400">06-07.</span>
+                  <div>
+                    <strong class="text-white block"><span class="font-mono text-emerald-300">Geometria_Elementos</span> &amp; <span class="font-mono text-emerald-300">Asignaciones</span></strong>
+                    <span class="text-slate-300">Modelado por intersecciones de grilla de columnas, vigas, muros (`Pier Label`), paños de losa, cargas uniformes ($\text{Ton/m}^2$), apoyos fijos y diafragma rígido `D1`.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4">
+            <div class="p-6 rounded-2xl bg-[#070c18] border border-emerald-500/40 space-y-5 shadow-glow-emerald">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-300 font-mono font-extrabold text-sm">
+                    XLSM
+                  </div>
+                  <div>
+                    <div class="text-base font-bold text-white">Importador.xlsm</div>
+                    <div class="text-xs font-mono text-emerald-300">./descargas/Importador.xlsm</div>
+                  </div>
+                </div>
+                <span class="text-xs font-mono font-bold text-slate-300">309 KB</span>
+              </div>
+
+              <ul class="space-y-2.5 text-xs text-slate-200 font-mono">
+                <li class="flex items-center justify-between">
+                  <span class="text-slate-400">Software destino:</span>
+                  <span class="text-white font-semibold">CSI ETABS (API)</span>
+                </li>
+                <li class="flex items-center justify-between">
+                  <span class="text-slate-400">Hojas incluidas:</span>
+                  <span class="text-emerald-300 font-semibold">7 Módulos Completos</span>
+                </li>
+                <li class="flex items-center justify-between">
+                  <span class="text-slate-400">Materiales:</span>
+                  <span class="text-white">H.A. · Acero · Mampostería</span>
+                </li>
+              </ul>
+
+              <a href="./descargas/Importador.xlsm" download="Importador.xlsm" class="w-full py-4 px-5 rounded-xl font-extrabold text-sm bg-gradient-to-r from-emerald-400 to-teal-300 text-[#070c18] hover:from-emerald-300 hover:to-white shadow-glow-emerald transition-all flex items-center justify-center gap-2.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Descargar Importador.xlsm</span>
+              </a>
+
+              <button type="button" onclick="openProjectModal('importador')" class="w-full py-2.5 px-4 rounded-xl font-mono text-xs font-semibold text-slate-200 bg-[#1e293b] border border-slate-700 hover:border-emerald-400 hover:text-emerald-300 transition-all">
+                Ver Guía Paso a Paso para ETABS
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ==================== SECCIÓN: CONTACTO Y COTIZACIONES ==================== -->
+  <section id="contacto" class="py-20 lg:py-24 bg-[#0f172a] border-t border-slate-800 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <div class="lg:col-span-6 space-y-6">
+          <div class="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#38bdf8]">
+            <span>// 03. SERVICIOS DE INGENIERÍA &amp; AUTOMATIZACIÓN</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Contacto y <span class="text-[#38bdf8]">Cotizaciones</span>
+          </h2>
+          <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+            Selecciona una categoría o completa el formulario para enviarnos tu requerimiento técnico directamente por correo electrónico.
+          </p>
+
+          <div class="space-y-4 pt-2">
+            
+            <div onclick="prefillQuote('Diseño y Cubicación de Estructuras Metálicas / Hormigón Armado')" class="cursor-pointer p-5 rounded-2xl bg-[#1e293b] border border-amber-500/40 hover:border-amber-400 transition-all flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/40 flex items-center justify-center shrink-0 font-mono font-extrabold">
+                01
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-white">Estructuras Metálicas y Hormigón Armado</h3>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                  Diseño estructural sismorresistente (NEC-15 / AISC 360 / ACI 318), memorias de cálculo, naves industriales, pórticos, cubicación de perfiles y montaje en obra.
+                </p>
+              </div>
+            </div>
+
+            <div onclick="prefillQuote('Desarrollo de Herramientas en Python / Macros API ETABS')" class="cursor-pointer p-5 rounded-2xl bg-[#1e293b] border border-emerald-500/40 hover:border-emerald-400 transition-all flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center justify-center shrink-0 font-mono font-extrabold">
+                02
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-white">Desarrollo de Herramientas y Automatización Python / Excel</h3>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                  Automatización de flujo de trabajo entre Excel y CSI ETABS/SAP2000, desarrollo de aplicaciones web técnicas y herramientas locales en Python a medida.
+                </p>
+              </div>
+            </div>
+
+            <div onclick="prefillQuote('Consulta sobre Simulador Complexivo (Uso Académico)')" class="cursor-pointer p-5 rounded-2xl bg-[#1e293b] border border-[#38bdf8]/40 hover:border-[#38bdf8] transition-all flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 flex items-center justify-center shrink-0 font-mono font-extrabold">
+                03
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-white">Asesorías Técnicas y Consulta sobre Simulador Complexivo</h3>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                  Asesoría en proyectos estructurales, revisión de modelos sísmicos y consultas académicas sobre el Simulador de Ingeniería Civil.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="lg:col-span-6">
+          <div class="p-6 sm:p-8 rounded-2xl bg-[#131b2e] border-2 border-[#38bdf8]/40 shadow-glow-cyan">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-700/80">
+              <div>
+                <h3 class="text-xl font-extrabold text-white">Solicitud por Correo Electrónico</h3>
+                <p class="text-xs font-mono text-slate-300 mt-0.5">Atención directa · Datos protegidos bajo LOPDP (Ecuador)</p>
+              </div>
+              <span class="w-11 h-11 rounded-xl bg-[#38bdf8]/20 border border-[#38bdf8]/40 flex items-center justify-center text-[#38bdf8]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </span>
+            </div>
+
+            <!-- CONFIGURACIÓN WEB3FORMS: Reemplaza 1ced7a00-3c94-4d79-aa03-0bd2f52cd4cf con tu clave gratuita de https://web3forms.com/ -->
+            <noscript>
+              <div class="mb-4 p-3.5 rounded-xl text-xs font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                JavaScript es obligatorio para enviar este formulario y generar la constancia de fecha y hora de consentimiento LOPDP. Activa JavaScript en tu navegador.
+              </div>
+            </noscript>
+            <form id="email-quote-form" method="POST" onsubmit="sendEmailQuote(event)" class="space-y-4">
+              <input type="hidden" id="web3forms-key" name="access_key" value="1ced7a00-3c94-4d79-aa03-0bd2f52cd4cf" />
+              <input type="hidden" name="subject" id="email-subject" value="Nueva Solicitud Técnica - Portal MJ Struct" />
+              <input type="hidden" name="from_name" value="Portal Web MJ Struct" />
+
+              <div>
+                <label for="client-name" class="block text-xs font-mono uppercase text-slate-200 mb-1.5">Nombre o Empresa *</label>
+                <input id="client-name" name="nombre_empresa" type="text" required placeholder="Ej. Ing. Jonathan / Constructora..." class="w-full px-4 py-3 rounded-xl bg-[#070c18] border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#38bdf8]" />
+              </div>
+
+              <div>
+                <label for="client-email" class="block text-xs font-mono uppercase text-slate-200 mb-1.5">Correo Electrónico de Contacto *</label>
+                <input id="client-email" name="email" type="email" required placeholder="ejemplo@correo.com" class="w-full px-4 py-3 rounded-xl bg-[#070c18] border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#38bdf8]" />
+              </div>
+
+              <div>
+                <label for="service-type" class="block text-xs font-mono uppercase text-slate-200 mb-1.5">Servicio o Herramienta *</label>
+                <select id="service-type" name="servicio" class="w-full px-4 py-3 rounded-xl bg-[#070c18] border border-slate-700 text-sm text-white focus:outline-none focus:border-[#38bdf8]">
+                  <option value="Diseño y Cubicación de Estructuras Metálicas / Hormigón Armado">1. Diseño de Estructuras Metálicas y Hormigón Armado</option>
+                  <option value="Desarrollo de Herramientas en Python / Macros API ETABS">2. Automatización en Python / Macros Excel → ETABS</option>
+                  <option value="Consulta sobre Simulador Complexivo (Uso Académico)">3. Consulta Académica · Simulador Examen Complexivo</option>
+                  <option value="Cubicador de Vigas y Control de Montaje en Acero">4. Cubicador de Vigas y Perfiles de Acero</option>
+                  <option value="Asesoría Técnica y Revisión de Proyectos Estructurales">5. Asesoría Técnica y Revisión Estructural</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="project-details" class="block text-xs font-mono uppercase text-slate-200 mb-1.5">Detalles del Requerimiento *</label>
+                <textarea id="project-details" name="detalles" rows="3" required placeholder="Indica los detalles de tu proyecto o consulta técnica..." class="w-full px-4 py-3 rounded-xl bg-[#070c18] border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#38bdf8]"></textarea>
+              </div>
+
+              <!-- DOS CASILLAS OBLIGATORIAS E INDEPENDIENTES (TÉRMINOS Y PRIVACIDAD) -->
+              <div class="p-3.5 rounded-xl bg-[#070c18]/90 border border-slate-700/90 space-y-2.5 text-xs text-slate-200">
+                <label for="accept-terms" class="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input id="accept-terms" name="acepta_terminos" type="checkbox" required class="mt-0.5 w-4 h-4 rounded border-slate-600 text-[#38bdf8] focus:ring-[#38bdf8] bg-[#131b2e]" />
+                  <span>
+                    He leído y acepto los
+                    <a href="./legal.html#terminos" target="_blank" rel="noopener noreferrer" class="text-[#38bdf8] font-semibold underline hover:text-cyan-300">Términos y Condiciones (v1.0)</a>,
+                    incluyendo el descargo de responsabilidad técnica. *
+                  </span>
+                </label>
+
+                <label for="accept-privacy" class="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input id="accept-privacy" name="acepta_privacidad" type="checkbox" required class="mt-0.5 w-4 h-4 rounded border-slate-600 text-emerald-400 focus:ring-emerald-400 bg-[#131b2e]" />
+                  <span>
+                    He leído y acepto la
+                    <a href="./legal.html#privacidad" target="_blank" rel="noopener noreferrer" class="text-emerald-300 font-semibold underline hover:text-emerald-200">Política de Privacidad y Protección de Datos (v1.0)</a>
+                    conforme a la LOPDP de Ecuador. *
+                  </span>
+                </label>
+              </div>
+
+              <div id="form-status-msg" class="hidden p-3.5 rounded-xl text-xs font-mono"></div>
+
+              <button id="submit-quote-btn" type="submit" disabled class="w-full py-4 px-6 rounded-xl font-extrabold text-sm bg-gradient-to-r from-[#38bdf8] to-emerald-400 hover:from-sky-300 hover:to-white text-[#070c18] shadow-glow-cyan transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span id="submit-quote-text">Enviar Solicitud por Correo</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-[#070c18] border-t border-slate-800 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        
+        <div class="flex items-center gap-3.5">
+          <img src="./assets/img/Mjstruct.webp" alt="Logo MJ Struct" class="w-10 h-10 rounded-xl object-cover border border-[#38bdf8]/60" />
+          <div>
+            <span class="text-lg font-extrabold text-white">MJ <span class="text-[#38bdf8]">STRUCT</span></span>
+            <p class="text-xs text-slate-400">Ingeniería Estructural · Automatización Python · Acero &amp; Hormigón Armado</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-5 text-xs font-mono text-slate-300">
+          <a href="./MapaPro-MJ%20Struct/index.html" class="hover:text-emerald-300 transition-colors">MapaPro NEC-15</a>
+          <a href="./Cubicar%20de%20vigas/index.html" class="hover:text-amber-300 transition-colors">Cubicador de Vigas</a>
+          <a href="./Transcriptor%20de%20Audio/index.html" class="hover:text-indigo-300 transition-colors">Transcriptor IA</a>
+          <a href="./descargas/Importador.xlsm" download="Importador.xlsm" class="hover:text-emerald-300 transition-colors">Importador.xlsm</a>
+        </div>
+
+        <div class="text-xs text-slate-400 font-mono">
+          &copy; <span id="current-year">2026</span> MJ Struct. Todos los derechos reservados.
+        </div>
+
+      </div>
+
+      <!-- Enlaces Legales y Descargo de Responsabilidad Técnica -->
+      <div class="pt-6 border-t border-slate-800/80 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-400">
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <a href="./legal.html#terminos" class="hover:text-[#38bdf8] underline decoration-slate-700">Términos y Condiciones</a>
+          <span>·</span>
+          <a href="./legal.html#privacidad" class="hover:text-emerald-300 underline decoration-slate-700">Política de Privacidad (LOPDP)</a>
+          <span>·</span>
+          <a href="./legal.html#cookies" class="hover:text-amber-300 underline decoration-slate-700">Cookies y Almacenamiento Local</a>
+          <span>·</span>
+          <a href="./legal.html#reembolsos" class="hover:text-indigo-300 underline decoration-slate-700">Política de Reembolsos</a>
+        </div>
+        <p class="text-[11px] text-slate-500 text-center lg:text-right max-w-xl">
+          Aviso Técnico: Las herramientas de este portal son de apoyo al cálculo y no reemplazan la verificación ni la firma de responsabilidad de un Ingeniero Civil o Estructural habilitado (NEC-15 · Ecuador).
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL INTERACTIVO DE FICHAS TÉCNICAS ==================== -->
+  <div id="info-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="relative w-full max-w-2xl rounded-2xl bg-[#131b2e] border-2 border-[#38bdf8]/60 shadow-glow-cobalt p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-700">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#38bdf8]"></span>
+          <h3 id="modal-title" class="text-lg sm:text-xl font-extrabold text-white">Detalles Técnicos</h3>
+        </div>
+        <button type="button" onclick="closeInfoModal()" class="p-1.5 rounded-lg bg-[#070c18] text-slate-300 hover:text-white border border-slate-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="modal-body" class="py-5 text-sm text-slate-200 space-y-4"></div>
+      <div class="pt-4 border-t border-slate-700 flex justify-end gap-3">
+        <button type="button" onclick="closeInfoModal()" class="px-5 py-2.5 rounded-xl text-xs font-mono font-bold bg-[#070c18] text-slate-200 border border-slate-700 hover:border-[#38bdf8]">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT PURO ==================== -->
+  <script>
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    document.getElementById('submit-quote-btn').disabled = false;
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconOpen = document.getElementById('menu-icon-open');
+    const iconClose = document.getElementById('menu-icon-close');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      const isHidden = mobileMenu.classList.contains('hidden');
+      if (isHidden) {
+        mobileMenu.classList.remove('hidden');
+        iconOpen.classList.add('hidden');
+        iconClose.classList.remove('hidden');
+      } else {
+        mobileMenu.classList.add('hidden');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+      }
+    });
+
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+      });
+    });
+
+    function prefillQuote(serviceName) {
+      const select = document.getElementById('service-type');
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === serviceName) {
+          select.selectedIndex = i;
+          break;
+        }
+      }
+      document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => {
+        document.getElementById('client-name').focus();
+      }, 600);
+    }
+
+    async function sendEmailQuote(event) {
+      event.preventDefault();
+      const name = document.getElementById('client-name').value.trim();
+      const email = document.getElementById('client-email').value.trim();
+      const service = document.getElementById('service-type').value;
+      const details = document.getElementById('project-details').value.trim();
+      const acceptedTerms = document.getElementById('accept-terms').checked;
+      const acceptedPrivacy = document.getElementById('accept-privacy').checked;
+      const statusBox = document.getElementById('form-status-msg');
+      const submitBtn = document.getElementById('submit-quote-btn');
+      const submitText = document.getElementById('submit-quote-text');
+
+      if (!acceptedTerms || !acceptedPrivacy) {
+        statusBox.className = 'p-3.5 rounded-xl text-xs font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40';
+        statusBox.textContent = 'Debes marcar por separado la aceptación de los Términos y Condiciones y de la Política de Privacidad.';
+        statusBox.classList.remove('hidden');
+        return;
+      }
+
+      const now = new Date();
+      const ecTimestamp = now.toLocaleString('es-EC', { timeZone: 'America/Guayaquil' });
+      const isoTimestamp = now.toISOString();
+      const consentProof = `Aceptó Términos y Condiciones (v1.0) [SI] y Política de Privacidad LOPDP (v1.0) [SI] el ${ecTimestamp} (UTC: ${isoTimestamp})`;
+
+      const accessKey = document.getElementById('web3forms-key').value.trim();
+      if (!accessKey || accessKey === 'TU_ACCESS_KEY_DE_WEB3FORMS_AQUI') {
+        statusBox.className = 'p-3.5 rounded-xl text-xs font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        statusBox.innerHTML = `<strong>Falta configurar tu Access Key de Web3Forms:</strong> Obtén tu clave gratuita en <a href="https://web3forms.com/" target="_blank" rel="noopener noreferrer" class="underline">web3forms.com</a> y pégala en <code class="text-white">id="web3forms-key"</code> en <code class="text-white">index.html</code>.<br><br>Constancia generada: <span class="text-emerald-300">${consentProof}</span>`;
+        statusBox.classList.remove('hidden');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitText.textContent = 'Enviando solicitud...';
+      statusBox.classList.add('hidden');
+
+      try {
+        const payload = {
+          access_key: accessKey,
+          subject: `Solicitud MJ Struct: ${service} (${name})`,
+          from_name: 'Portal Web MJ Struct',
+          nombre_empresa: name,
+          email: email,
+          servicio: service,
+          detalles: details,
+          constancia_consentimiento_lopdp: consentProof,
+          casilla_terminos_v1: 'ACEPTADO_EXPRESAMENTE',
+          casilla_privacidad_v1: 'ACEPTADO_EXPRESAMENTE',
+          fecha_hora_ecuador: ecTimestamp,
+          fecha_hora_utc: isoTimestamp
+        };
+
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          statusBox.className = 'p-3.5 rounded-xl text-xs font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+          statusBox.innerHTML = `<strong>¡Solicitud enviada con éxito!</strong> Te responderemos pronto a <span class="text-white">${email}</span>.<br><span class="text-[11px] text-slate-300">Registro: ${consentProof}</span>`;
+          statusBox.classList.remove('hidden');
+          document.getElementById('email-quote-form').reset();
+        } else {
+          throw new Error(result.message || 'No se pudo procesar el envío.');
+        }
+      } catch (err) {
+        statusBox.className = 'p-3.5 rounded-xl text-xs font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40';
+        statusBox.textContent = 'Error al enviar el formulario: ' + err.message;
+        statusBox.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitText.textContent = 'Enviar Solicitud por Correo';
+      }
+    }
+
+    function openProjectModal(projectKey) {
+      const modal = document.getElementById('info-modal');
+      const title = document.getElementById('modal-title');
+      const body = document.getElementById('modal-body');
+
+      if (projectKey === 'cubicador') {
+        title.textContent = 'Cubicador de Vigas y Perfiles de Acero (MJ Struct)';
+        body.innerHTML = `
+          <p>Desarrollado para control de peso lineal, transporte y montaje de elementos de acero estructural ($\rho = 7850\text{ kg/m}^3$):</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+            <div class="p-3.5 rounded-xl bg-[#070c18] border border-amber-500/40">
+              <div class="text-amber-300 font-bold mb-1">1. Catálogo Comercial Integrado</div>
+              <div class="text-slate-300">Perfiles IPE (80 a 600), HEA (100 a 300), HEB (100 a 300), IPN (100 a 200), perfiles americanos W (W8 a W16) y tubulares HSS ASTM A500 (100x100 a 300x300 mm).</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-[#070c18] border border-amber-500/40">
+              <div class="text-amber-300 font-bold mb-1">2. Vigas Armadas y Especiales</div>
+              <div class="text-slate-300">Cálculo de vigas soldadas Tipo I ($h_w = h - 2t_f$), aporte de cordones de soldadura, columnas cajón (2 canales U), correas conformadas en frío G/U y placas planas.</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-[#070c18] border border-amber-500/40 sm:col-span-2">
+              <div class="text-amber-300 font-bold mb-1">3. Descuento Exacto por Destajes (Notch / Cope) y Exportación</div>
+              <div class="text-slate-300">Deducción volumétrica automática en 1 o 2 extremos (superior / inferior) según longitud de destaje $L_d$, almacenamiento persistente y exportación directa a Excel (.xls), CSV y PDF.</div>
+            </div>
+          </div>
+        `;
+      } else if (projectKey === 'transcriptor') {
+        title.textContent = 'Transcriptor Local de Video a Texto (Python + Faster-Whisper)';
+        body.innerHTML = `
+          <p>Arquitectura del servidor local ubicado en la carpeta <code class="text-indigo-300 font-mono">/Transcriptor de Audio</code>:</p>
+          <div class="p-4 rounded-xl bg-[#070c18] border border-indigo-500/40 space-y-2 font-mono text-xs">
+            <div class="text-indigo-300 font-bold">PIPELINE EN MEMORIA RAM (SIN ARCHIVOS TEMPORALES):</div>
+            <div>• <strong>Extracción:</strong> Conecta <code class="text-white">yt-dlp</code> con <code class="text-white">imageio-ffmpeg</code> mediante tuberías (<code class="text-emerald-300">stdout → stdin</code>) convirtiendo el audio a PCM 16 kHz mono directamente en memoria RAM (límite de seguridad de 192 MB / 100 min).</div>
+            <div>• <strong>Transcripción IA:</strong> Procesa el arreglo NumPy con <code class="text-white">Faster-Whisper</code> en CPU con cuantización <code class="text-indigo-300">int8</code> y filtro VAD (<code class="text-indigo-300">vad_filter=True</code>).</div>
+          </div>
+        `;
+      } else if (projectKey === 'importador') {
+        title.textContent = 'Guía de Uso: Importador.xlsm (Excel → CSI ETABS)';
+        body.innerHTML = `
+          <p>El archivo <code class="text-emerald-300 font-mono">./descargas/Importador.xlsm</code> automatiza la creación completa del modelo estructural en <strong>CSI ETABS</strong> vía API:</p>
+          <div class="p-4 rounded-xl bg-[#070c18] border border-emerald-500/40 space-y-2 font-mono text-xs">
+            <div>1. Abre <strong>CSI ETABS</strong> con un modelo nuevo y unidades consistentes.</div>
+            <div>2. Abre <strong>Importador.xlsm</strong> y habilita las Macros VBA.</div>
+            <div>3. Completa las 7 hojas en orden: <strong class="text-emerald-300">Grillas → Materiales → Secciones → Secciones_Area → Cargas_Combinaciones → Geometria_Elementos → Asignaciones_Analisis</strong>.</div>
+            <div>4. Ejecuta la macro de importación para transferir toda la geometría, secciones y cargas automáticamente.</div>
+          </div>
+          <div class="pt-2">
+            <a href="./descargas/Importador.xlsm" download="Importador.xlsm" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-400 text-[#070c18] font-bold text-xs">
+              Descargar Importador.xlsm Ahora
+            </a>
+          </div>
+        `;
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeInfoModal() {
+      const modal = document.getElementById('info-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  </script>
+</body>
+</html>

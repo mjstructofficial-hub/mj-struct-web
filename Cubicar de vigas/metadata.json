@@ -1,0 +1,7 @@
+{
+  "name": "Cubicador Vigas",
+  "description": "Control y cubicador de perfiles de acero comerciales y vigas armadas para transporte y montaje en obra.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
