@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f172a">
+  <meta name="mj-transcriber-api" content="https://mj-struct-transcriptor.onrender.com">
   <title>Transcriptor IA | MJ Struct</title>
   <link rel="icon" type="image/webp" href="../assets/img/Mjstruct.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -63,28 +64,32 @@
     <section class="w-full rounded-3xl border border-[#38bdf8]/40 bg-[#1e293b]/95 p-6 shadow-2xl shadow-black/40 backdrop-blur sm:p-10">
       <div>
         <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Video a texto con IA</h1>
+          <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Audio y video a texto</h1>
           <span id="modeBadge" class="rounded-full border border-[#38bdf8]/30 bg-[#38bdf8]/10 px-2.5 py-1 text-xs font-mono font-semibold text-sky-200">En preparación</span>
         </div>
         <p id="demoHelp" class="mt-4 rounded-xl border border-indigo-500/40 bg-[#070c18]/90 p-3.5 text-sm leading-relaxed text-slate-300">
           La transcripción en línea estará disponible aquí cuando se habilite el servidor.
         </p>
         <p id="localHelp" class="mt-3 max-w-xl text-sm text-slate-300" hidden>Pega un enlace público de YouTube, TikTok, Instagram Reels o Facebook. El audio se procesa en memoria con Faster-Whisper.</p>
+        <div id="onlineHelp" class="mt-3 max-w-xl space-y-2 text-sm text-slate-300" hidden>
+          <p>Pega el enlace directo de un audio o video de <strong>Wikimedia Commons</strong> que tengas permiso para transcribir.</p>
+          <p class="text-xs leading-relaxed">En la ficha de Wikimedia, haz clic derecho o mantén pulsado <strong>Archivo original</strong> y copia la dirección. Admite hasta 2 minutos y 16 MiB por archivo. <a href="../legal.html#privacidad" class="text-sky-200 underline underline-offset-2">Privacidad</a></p>
+        </div>
       </div>
 
       <form id="form" method="post" class="mt-6 space-y-4" hidden>
-        <label for="url" class="block text-xs font-mono uppercase text-slate-300">Enlace del video</label>
+        <label for="url" class="block text-xs font-mono uppercase text-slate-300">Enlace de audio o video</label>
         <div class="flex flex-col gap-3 sm:flex-row">
-          <input id="url" name="url" type="url" required disabled autocomplete="url" placeholder="https://www.youtube.com/watch?v=…"
+          <input id="url" name="url" type="url" required disabled maxlength="2048" autocomplete="url" placeholder="https://…"
             class="min-w-0 flex-1 rounded-xl border border-slate-700 bg-[#070c18] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-[#38bdf8]">
           <button id="submit" type="submit" disabled class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#38bdf8] to-cyan-300 px-6 py-3 text-sm font-extrabold text-[#070c18] transition hover:from-sky-300 hover:to-white disabled:cursor-not-allowed disabled:opacity-60">
-            <span id="spinner" class="spinner hidden" aria-hidden="true"></span><span id="submitText">Transcribir</span>
+            <span id="spinner" class="spinner" aria-hidden="true" hidden></span><span id="submitText">Transcribir</span>
           </button>
         </div>
       </form>
 
       <p id="status" class="mt-4 min-h-6 text-sm text-slate-400" role="status" aria-live="polite" hidden></p>
-      <section id="resultSection" class="mt-5 hidden">
+      <section id="resultSection" class="mt-5" hidden>
         <div class="mb-2 flex items-center justify-between gap-3">
           <h2 class="font-bold text-white">Transcripción</h2>
           <button id="copy" type="button" class="rounded-lg border border-slate-700 bg-[#070c18] px-3 py-2 text-xs font-mono text-slate-200 transition hover:border-[#38bdf8] hover:text-[#38bdf8]">Copiar texto</button>
@@ -117,49 +122,185 @@
     const result = document.querySelector('#result');
     const copyButton = document.querySelector('#copy');
 
-    const isLocalServer = ['127.0.0.1', 'localhost'].includes(window.location.hostname) && window.location.protocol.startsWith('http');
-    if (isLocalServer) {
-      document.querySelector('#modeBadge').textContent = 'Ejecución local';
+    function configuredApiBase() {
+      if (window.location.protocol !== 'https:') return '';
+      const config = document.querySelector('meta[name="mj-transcriber-api"]').content.trim();
+      if (!config) return '';
+      try {
+        const address = new URL(config);
+        if (address.protocol !== 'https:' || address.username || address.password || address.search || address.hash) return '';
+        return address.href.replace(/\/+$/, '');
+      } catch {
+        return '';
+      }
+    }
+
+    const isLocalServer = ['127.0.0.1', 'localhost'].includes(window.location.hostname)
+      && ['http:', 'https:'].includes(window.location.protocol);
+    const onlineApi = isLocalServer ? '' : configuredApiBase();
+    const requestTimeoutMs = 20_000;
+    const startupWaitMs = 120_000;
+    const onlineWaitMs = 15 * 60_000;
+
+    if (isLocalServer || onlineApi) {
+      document.querySelector('#modeBadge').textContent = isLocalServer ? 'Ejecución local' : 'Transcripción en línea';
       document.querySelector('#demoHelp').hidden = true;
-      document.querySelector('#localHelp').hidden = false;
+      document.querySelector(isLocalServer ? '#localHelp' : '#onlineHelp').hidden = false;
       form.hidden = false;
       status.hidden = false;
       urlInput.disabled = false;
       submitButton.disabled = false;
     }
 
+    class TranscriberError extends Error {
+      constructor(message, retryable = false) {
+        super(message);
+        this.retryable = retryable;
+      }
+    }
+
+    async function apiRequest(path, options = {}, timeoutMs = requestTimeoutMs) {
+      const controller = new AbortController();
+      const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
+      try {
+        const response = await fetch(onlineApi + path, {
+          ...options,
+          signal: controller.signal,
+          credentials: 'omit',
+          cache: 'no-store',
+          redirect: 'error',
+        });
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json') ? await response.json() : null;
+
+        if (!data && isLocalServer) {
+          throw new TranscriberError('El motor de transcripción local no está activo. Ejecuta run.bat en la carpeta Transcriptor de Audio y vuelve a abrir la herramienta desde el portal local.');
+        }
+        if (!response.ok || !data || typeof data !== 'object') {
+          const detail = typeof data?.detail === 'string' ? data.detail : 'El servidor no pudo completar la solicitud.';
+          const starting = path === '/healthz' && response.ok;
+          throw new TranscriberError(detail, starting || response.status >= 500);
+        }
+        return { response, data };
+      } catch (error) {
+        if (error instanceof TranscriberError) throw error;
+        const message = controller.signal.aborted ? 'El servidor tardó demasiado en responder.' : 'No se pudo conectar con el servidor de transcripción.';
+        throw new TranscriberError(message, true);
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function waitForOnlineServer() {
+      const deadline = Date.now() + startupWaitMs;
+      let delay = 1_500;
+
+      while (true) {
+        const requestBudget = deadline - Date.now();
+        if (requestBudget <= 0) break;
+        try {
+          const { data } = await apiRequest('/healthz', {}, Math.min(8_000, requestBudget));
+          if (data.status === 'ok') return;
+        } catch (error) {
+          if (!error.retryable) throw error;
+        }
+        const remaining = deadline - Date.now();
+        if (remaining <= 0) break;
+        await wait(Math.min(delay, remaining));
+        delay = Math.min(8_000, delay * 2);
+      }
+      throw new TranscriberError('El servidor todavía se está iniciando. Vuelve a intentarlo en unos momentos.');
+    }
+
+    const jobMessages = {
+      queued: 'Solicitud recibida. Esperando un turno…',
+      processing: 'Procesando el audio. Puede tardar unos minutos…',
+    };
+
+    async function onlineTranscript(id) {
+      const deadline = Date.now() + onlineWaitMs;
+      const path = '/transcribe/' + encodeURIComponent(id);
+      let delay = 1_500;
+      let failures = 0;
+
+      while (Date.now() < deadline) {
+        await wait(Math.min(delay, deadline - Date.now()));
+        const remaining = deadline - Date.now();
+        if (remaining <= 0) break;
+        delay = Math.min(8_000, Math.round(delay * 1.35));
+
+        let job;
+        try {
+          ({ data: job } = await apiRequest(path, {}, Math.min(requestTimeoutMs, remaining)));
+          failures = 0;
+        } catch (error) {
+          if (!error.retryable || ++failures >= 4) throw error;
+          status.textContent = 'Se perdió la conexión. Consultando de nuevo…';
+          continue;
+        }
+
+        if (job.status === 'complete') return job.transcript;
+        if (job.status === 'error') {
+          throw new TranscriberError(typeof job.detail === 'string' ? job.detail : 'No se pudo transcribir este enlace.');
+        }
+        if (job.status !== 'queued' && job.status !== 'processing') {
+          throw new TranscriberError('El servidor devolvió un estado desconocido.');
+        }
+        const message = jobMessages[job.status];
+        if (status.textContent !== message) status.textContent = message;
+      }
+      throw new TranscriberError('Se agotó el tiempo de espera. Prueba con un audio o video más corto.');
+    }
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (!isLocalServer) return;
-      resultSection.classList.add('hidden');
+      if ((!isLocalServer && !onlineApi) || submitButton.disabled) return;
+      const url = urlInput.value.trim();
+      resultSection.hidden = true;
+      result.value = '';
       status.className = 'mt-4 min-h-6 text-sm text-slate-400';
-      status.textContent = 'Descargando y transcribiendo en esta computadora… Puede tardar según la duración del video.';
+      status.textContent = isLocalServer ? 'Descargando y transcribiendo en esta computadora…' : 'Iniciando servidor de transcripción…';
+      form.setAttribute('aria-busy', 'true');
       submitButton.disabled = true;
-      spinner.classList.remove('hidden');
+      urlInput.disabled = true;
+      spinner.hidden = false;
       submitText.textContent = 'Procesando';
 
       try {
-        const response = await fetch('/transcribe', {
+        if (onlineApi) {
+          await waitForOnlineServer();
+          status.textContent = 'Enviando el enlace al servidor…';
+        }
+        const { response, data } = await apiRequest('/transcribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: urlInput.value.trim() })
-        });
-        const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('application/json')) {
-          throw new Error('El motor de transcripción no está activo. Ejecuta run.bat en la carpeta Transcriptor de Audio y vuelve a abrir la herramienta desde el portal local.');
+          body: JSON.stringify({ url })
+        }, isLocalServer ? 0 : requestTimeoutMs);
+        let transcript = data.transcript;
+        if (onlineApi) {
+          if (response.status !== 202 || typeof data.id !== 'string' || !/^[a-zA-Z0-9-]{1,128}$/.test(data.id)) {
+            throw new TranscriberError('El servidor no confirmó la solicitud de transcripción.');
+          }
+          status.textContent = data.status === 'processing' ? jobMessages.processing : jobMessages.queued;
+          transcript = await onlineTranscript(data.id);
         }
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.detail || 'No se pudo completar la transcripción.');
-        result.value = data.transcript;
-        resultSection.classList.remove('hidden');
+        if (typeof transcript !== 'string' || !transcript.trim()) {
+          throw new TranscriberError('El servidor no devolvió una transcripción de audio.');
+        }
+        result.value = transcript;
+        resultSection.hidden = false;
         status.textContent = 'Transcripción completada.';
         status.className = 'mt-4 min-h-6 text-sm text-emerald-300';
       } catch (error) {
-        status.textContent = error.message || 'Error de conexión con el servidor local.';
+        status.textContent = error.message || 'No se pudo completar la transcripción.';
         status.className = 'mt-4 min-h-6 text-sm text-rose-300';
       } finally {
+        form.setAttribute('aria-busy', 'false');
         submitButton.disabled = false;
-        spinner.classList.add('hidden');
+        urlInput.disabled = false;
+        spinner.hidden = true;
         submitText.textContent = 'Transcribir';
       }
     });
@@ -172,9 +313,8 @@
       } catch {
         result.focus();
         result.select();
-        document.execCommand('copy');
-        status.textContent = 'Texto copiado al portapapeles.';
-        status.className = 'mt-4 min-h-6 text-sm text-emerald-300';
+        status.textContent = 'El texto está seleccionado. Usa la opción Copiar de tu dispositivo.';
+        status.className = 'mt-4 min-h-6 text-sm text-slate-400';
       }
     });
   </script>
