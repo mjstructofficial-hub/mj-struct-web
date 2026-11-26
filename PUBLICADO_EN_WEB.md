@@ -17,7 +17,7 @@ GitHub Pages usa **Deploy from a branch**, rama `main`, carpeta `/(root)`. La co
 | `MapaPro-MJ Struct/index.html` | MapaPro NEC-15 |
 | `MapaPro-MJ Struct/Mjstruct.webp` | Logo de MapaPro |
 | `Cubicar de vigas/index.html` | Cubicador web |
-| `Transcriptor de Audio/index.html` | Transcripción de archivos públicos de Wikimedia Commons mediante enlace directo |
+| `Transcriptor de Audio/index.html` | Transcripción de videos públicos compatibles de TikTok y enlaces directos de Wikimedia Commons |
 | `assets/img/Mjstruct.png` | Logo PNG |
 | `assets/img/Mjstruct.webp` | Logo WebP |
 | `assets/img/og-mj-struct.png` | Tarjeta que acompaña al enlace al compartir la portada |
@@ -27,7 +27,7 @@ GitHub Pages usa **Deploy from a branch**, rama `main`, carpeta `/(root)`. La co
 
 ## Compartir el sitio
 
-Comparte la portada enlazada arriba. Ahí se puede abrir MapaPro NEC-15 y el Cubicador de Vigas, descargar el Importador de Excel para ETABS y el Migrador CSI, o solicitar una cotización. El Simulador se ofrece por consulta y el Transcriptor admite archivos públicos de Wikimedia Commons de hasta dos minutos mediante enlace directo.
+Comparte la portada enlazada arriba. Ahí se puede abrir MapaPro NEC-15 y el Cubicador de Vigas, descargar el Importador de Excel para ETABS y el Migrador CSI, o solicitar una cotización. El Simulador se ofrece por consulta. El Transcriptor admite videos públicos compatibles de TikTok y enlaces directos de Wikimedia Commons de hasta dos minutos.
 
 ## Organización de las carpetas
 
