@@ -9,6 +9,7 @@ exclude:
   - "Cubicar de vigas/metadata.json"
   - "Cubicar de vigas/settings.gradle.kts"
   - "Transcriptor de Audio/app.py"
+  - "Transcriptor de Audio/engine.py"
   - "Transcriptor de Audio/requirements.txt"
   - "Transcriptor de Audio/run.bat"
   - "iniciar_programa.bat"
