@@ -73,7 +73,7 @@
         <p id="localHelp" class="mt-3 max-w-xl text-sm text-slate-300" hidden>Pega un enlace público de YouTube, TikTok, Instagram Reels o Facebook. El audio se procesa en memoria con Faster-Whisper.</p>
         <div id="onlineHelp" class="mt-3 max-w-xl space-y-2 text-sm text-slate-300" hidden>
           <p>Pega un enlace y pulsa <strong>Transcribir</strong>.</p>
-          <p class="text-xs leading-relaxed">Admite videos públicos compatibles de TikTok y enlaces a <strong>Archivo original</strong> de Wikimedia Commons. Hasta 2 minutos y hasta 16 MiB para archivos de Wikimedia. <a href="../legal.html#privacidad" class="text-sky-200 underline underline-offset-2">Privacidad</a></p>
+          <p class="text-xs leading-relaxed">Admite videos públicos compatibles de TikTok y enlaces a <strong>Archivo original</strong> de Wikimedia Commons. Hasta 7 minutos, con un máximo de 16 MiB para archivos de Wikimedia. <a href="../legal.html#privacidad" class="text-sky-200 underline underline-offset-2">Privacidad</a></p>
         </div>
       </div>
 
@@ -140,7 +140,7 @@
     const onlineApi = isLocalServer ? '' : configuredApiBase();
     const requestTimeoutMs = 20_000;
     const startupWaitMs = 120_000;
-    const onlineWaitMs = 15 * 60_000;
+    const onlineWaitMs = 25 * 60_000;
 
     if (isLocalServer || onlineApi) {
       document.querySelector('#modeBadge').textContent = isLocalServer ? 'Ejecución local' : 'Transcripción en línea';

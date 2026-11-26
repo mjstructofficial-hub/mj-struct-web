@@ -27,7 +27,7 @@ GitHub Pages usa **Deploy from a branch**, rama `main`, carpeta `/(root)`. La co
 
 ## Compartir el sitio
 
-Comparte la portada enlazada arriba. Ahí se puede abrir MapaPro NEC-15 y el Cubicador de Vigas, descargar el Importador de Excel para ETABS y el Migrador CSI, o solicitar una cotización. El Simulador se ofrece por consulta. El Transcriptor admite videos públicos compatibles de TikTok y enlaces directos de Wikimedia Commons de hasta dos minutos.
+Comparte la portada enlazada arriba. Ahí se puede abrir MapaPro NEC-15 y el Cubicador de Vigas, descargar el Importador de Excel para ETABS y el Migrador CSI, o solicitar una cotización. El Simulador se ofrece por consulta. El Transcriptor admite videos públicos compatibles de TikTok y enlaces directos de Wikimedia Commons de hasta siete minutos.
 
 ## Organización de las carpetas
 
